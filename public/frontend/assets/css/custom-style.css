@@ -1,0 +1,259 @@
+* {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: url(images/1330653.png) no-repeat;
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    padding: 40px 20px;
+  }
+
+  /* Main container for the form and info section */
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1000px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(18px);
+    border-radius: 80px 5px;
+    padding: 30px;
+    overflow: hidden;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+
+  /* Left branding section */
+  .left-side {
+    flex: 1;
+    padding: 15px;
+  }
+
+  .left-side .logo {
+    color: #fff;
+    font-size: 30px;
+  }
+
+  .left-side h2 {
+    padding-top: 80px;
+    font-size: 40px;
+    line-height: 1;
+  }
+
+  .left-side p {
+    font-size: 16px;
+    margin: 20px 0;
+  }
+
+  /* Right form section */
+  .right-side {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .right-side form {
+    width: 100%;
+  }
+
+  .right-side h1 {
+    font-size: 36px;
+    text-align: left;
+  }
+
+  .form-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .input-box {
+    width: 100%;
+    margin: 15px 0;
+  }
+
+  .input-box input {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    color: #fff;
+  }
+
+  .input-box input::placeholder {
+    color: #ccc;
+  }
+
+  .input select {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    color: #fff;
+    appearance: none;
+  }
+
+  .input select option {
+    background: #fff;
+    color: #000;
+  }
+
+  .two-column {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .two-column .input-box,
+  .two-column .input {
+    flex: 1 1 calc(50% - 10px);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: #fff;
+    color: #333;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    background: #e1306c;
+    color: #fff;
+    transform: scale(1.03);
+  }
+
+  .register-link {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .register-link a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .register-link a:hover {
+    color: #e1306c;
+    text-decoration: underline;
+  }
+
+  .footer-section {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .footer-section .logo {
+    font-size: 28px;
+    color: #fff;
+  }
+
+  .text-left-side h2 {
+    font-size: 24px;
+    margin-top: 10px;
+  }
+
+  .text-left-side p {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .social-icons {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+  }
+
+  .social-icons a {
+    color: #fff;
+    font-size: 24px;
+    margin: 0 10px;
+    transition: transform 0.3s;
+  }
+
+  .social-icons a:hover {
+    transform: scale(1.2);
+  }
+
+  .social-icons a:nth-child(1):hover { color: #3b5998; }
+  .social-icons a:nth-child(2):hover { color: #db4437; }
+  .social-icons a:nth-child(3):hover { color: #e1306c; }
+  .social-icons a:nth-child(4):hover { color: #0077b5; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .left-side, .right-side {
+      flex: 1 1 100%;
+      padding: 10px;
+    }
+
+    .left-side h2 {
+      font-size: 30px;
+      padding-top: 20px;
+    }
+
+    .social-icons {
+      flex-direction: column;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .social-icons a {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+
+    .right-side .btn {
+      font-size: 14px;
+      height: 40px;
+    }
+
+    .right-side h1,
+    .form-title {
+      font-size: 30px;
+    }
+
+    .register-link a {
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .left-side h2 {
+      font-size: 24px;
+    }
+
+    .right-side .btn {
+      font-size: 12px;
+      height: 35px;
+    }
+
+    .social-icons a {
+      font-size: 18px;
+    }
+  }

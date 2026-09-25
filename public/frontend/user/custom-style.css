@@ -1,0 +1,247 @@
+* {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: url(images/1330653.png) no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Container for left and right sides */
+.container {
+  display: flex; /* Flexbox layout for two columns */
+  width: 90%; /* Adjust width for small devices */
+  max-width: 1000px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  border-radius: 80px 5px;
+  padding: 30px;
+  overflow: hidden;
+  flex-wrap: wrap; /* Allow the columns to wrap on small screens */
+}
+
+.left-side {
+  flex: 1;
+  padding: 15px;
+}
+
+.left-side .logo {
+  color: #fff;
+  font-size: 30px;
+}
+
+.left-side h2 {
+  padding-top: 80px;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.left-side p {
+  font-size: 16px;
+  margin: 20px 0;
+}
+
+.right-side {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 20px;
+}
+
+.social-icons a {
+  color: #fff;
+  font-size: 24px;
+  margin-left: 5px;
+  cursor: pointer;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.social-icons a:hover {
+  transform: scale(1.2);
+}
+
+/* Social Media Icon Hover Effects */
+.social-icons a:first-child:hover { color: #3b5998; }  /* Facebook */
+.social-icons a:nth-child(2):hover { color: #db4437; }  /* Gmail */
+.social-icons a:nth-child(3):hover { color: #e1306c; }  /* Instagram */
+.social-icons a:last-child:hover { color: #0077b5; }  /* LinkedIn */
+
+/* Form styles */
+.right-side form {
+  width: 100%;
+}
+
+.right-side h1 {
+  font-size: 36px;
+  text-align: left;
+}
+
+.input-box {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  margin: 30px 0px;
+}
+
+.input-box input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  border: 2px solid rgb(255, 255, 255, 0.2);
+  border-radius: 5px;
+  font-size: 16px;
+  color: #fff;
+  padding: 20px 45px 20px 20px;
+}
+
+.input-box input::placeholder {
+  color: #fff;
+}
+
+.input-box i {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+}
+
+.remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14.5px;
+  margin: -15px 0px 15px;
+}
+
+.remember-forgot label input {
+  color: #fff;
+  margin-right: 3px;
+}
+
+.remember-forgot a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.remember-forgot a:hover {
+  color: #e1306c;
+  text-decoration: underline;
+}
+
+.right-side .btn {
+  width: 100%;
+  height: 45px;
+  background: #fff;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.right-side .btn:hover {
+  background-color: #e1306c; /* Pink color on hover */
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.right-side .register-link {
+  font-size: 14.5px;
+  text-align: center;
+  margin: 20px 0px 15px;
+}
+
+.right-side .register-link p a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s, text-decoration 0.3s;
+}
+
+.right-side .register-link p a:hover {
+  text-decoration: underline;
+  color: #e1306c; /* Pink color on hover */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* Stack the sections on smaller screens */
+    width: 100%;
+    padding: 20px;
+  }
+
+  .left-side, .right-side {
+    flex: 1 1 100%;
+    padding: 10px;
+  }
+
+  .left-side h2 {
+    font-size: 30px; /* Reduce the heading size */
+    padding-top: 20px;
+  }
+
+  .social-icons {
+    flex-direction: column; /* Stack the social icons */
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .social-icons a {
+    font-size: 20px; /* Smaller icon size */
+    margin-left: 0;
+    margin-bottom: 10px; /* Space between icons */
+  }
+
+  .right-side .btn {
+    font-size: 14px; /* Reduce the button size */
+    height: 40px;
+  }
+
+  .right-side h1 {
+    font-size: 30px; /* Reduce heading size */
+  }
+
+  .right-side .register-link p a {
+    font-size: 12px; /* Smaller text size for register link */
+  }
+}
+
+@media (max-width: 480px) {
+  .left-side h2 {
+    font-size: 24px; /* Further reduce heading size on very small screens */
+  }
+
+  .right-side .btn {
+    font-size: 12px; /* Even smaller button text */
+    height: 35px;
+  }
+
+  .social-icons a {
+    font-size: 18px; /* Smaller icon size */
+  }
+}

@@ -1,0 +1,111 @@
+<?php
+
+namespace App\Http\Controllers\User;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Sell;
+use Illuminate\Support\Facades\Auth;
+use Flasher\Toastr\Prime\ToastrInterface;
+
+class PropertyController extends Controller
+{
+    protected $toastr;
+
+    public function __construct(ToastrInterface $toastr)
+    {
+        $this->toastr = $toastr;
+    }
+
+    /**
+     * Display the form for adding a property.
+     */
+    public function index()
+    {
+        $user = Auth::user();
+        $properties = Sell::where('user_id', $user->id)->latest()->paginate(10);
+
+        return view('user.properties.index', compact('user', 'properties'));
+    }
+    public function create()
+    {
+        $user = Auth::user();
+        return view('user.properties.create', compact('user'));
+    }
+    /**
+     * Store a new property.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'address' => 'required|string|max:255',
+            'zilla' => 'required|string|max:100',
+            'bds' => 'nullable|string|max:100',
+            'morrja' => 'nullable|string|max:100',
+            'category' => 'required|string',
+            'road' => 'nullable|string|max:100',
+            'bayna' => 'nullable|string|max:100',
+            'qnty' => 'nullable|integer|max:100',
+            'price' => 'nullable|string|max:100',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        Sell::newSell($request);
+
+        $this->toastr->success('Property form submitted successfully!');
+        return redirect()->back();
+    }
+
+
+    /**
+     * Display the user's favorite properties.
+     */
+
+
+    /**
+     * Show the form for editing a specific property.
+     */
+    public function edit(Sell $property)
+    {
+        $user = Auth::user();
+        return view('user.properties.edit', compact('property', 'user'));
+    }
+    /**
+     * Update a specific property.
+     */
+    public function update(Request $request, Sell $property)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'address' => 'required|string|max:255',
+            'zilla' => 'required|string|max:100',
+            'bds' => 'nullable|string|max:100',
+            'morrja' => 'nullable|string|max:100',
+            'category' => 'required|string',
+            'road' => 'nullable|string|max:100',
+            'bayna' => 'nullable|string|max:100',
+            'qnty' => 'nullable|integer|max:100',
+            'price' => 'nullable|string|max:100',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        Sell::updateSell($request, $property->id);
+
+        $this->toastr->success('Property updated successfully!');
+        return redirect()->route('properties.index'); // Redirect to the list of properties
+    }
+
+    /**
+     * Remove a specific property.
+     */
+    public function destroy(Sell $property)
+    {
+        Sell::deleteSell($property);
+
+        $this->toastr->success('Property deleted successfully!');
+        return redirect()->route('properties.index'); // Redirect after deletion
+    }
+}
