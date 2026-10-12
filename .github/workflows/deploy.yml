@@ -1,0 +1,24 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Sync Files via SSH
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-avz --delete"
+          EXCLUDE: "/.git/, /.github/, /.env, /.htaccess, /vendor/, /node_modules/"
+          SERVER_PORT: "22"
+          REMOTE_HOST: "ssh.gb.stackcp.com"
+          REMOTE_USER: "withbd.com" 
+          TARGET: "/home/sites/32a/a/ae27c3a9d7/www.withbd.com/emobile"
