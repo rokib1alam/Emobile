@@ -11,7 +11,63 @@
 <!-- START MAIN CONTENT -->
 <!-- END MAIN CONTENT -->
 <div class="main_content">
+    <!-- START SECTION CATEGORIES -->
+    <div class="section small_pb small_pt">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="heading_s4 text-center">
+                        <h2>Top Categories</h2>
+                    </div>
+                    <p class="text-center leads">Explore our top categories with trending products.</p>
+                </div>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="cat_slider cat_style1 mt-4 mt-md-0 carousel_slider owl-carousel owl-theme nav_style5" 
+                        data-loop="true" 
+                        data-dots="false" 
+                        data-nav="true" 
+                        data-margin="30" 
+                        data-responsive='{"0":{"items": "2"}, "480":{"items": "3"}, "576":{"items": "4"}, "768":{"items": "5"}, "991":{"items": "6"}, "1199":{"items": "7"}}'>
+                        
+                        @php
+                            $categories = App\Models\Category::latest()->get();
+                        @endphp
 
+                        @foreach($categories as $category)
+                            @php
+                                
+                                $imgSrc = $category->image ?? $category->category_image ?? null;
+
+                                if ($imgSrc) {
+                                   
+                                    if (str_starts_with($imgSrc, 'public/')) {
+                                        $imgSrc = substr($imgSrc, 7);
+                                    }
+                                    $finalImage = asset($imgSrc);
+                                } else {
+                                   
+                                    $finalImage = asset('frontend/assets/images/no-image.png');
+                                }
+                            @endphp
+
+                            <div class="item">
+                                <div class="categories_box">
+                                    <a href="{{ route('slug.handler', $category->category_slug) }}">
+                                        <img src="{{ $finalImage }}" alt="{{ $category->category_name }}"/>
+                                        <span>{{ $category->category_name }}</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END SECTION CATEGORIES -->
     <!-- START SECTION SHOP -->
     <div class="section small_pt pb-0">
         <div class="custom-container">
@@ -19,7 +75,7 @@
                 <div class="col-xl-3 d-none d-xl-block">
                     <div class="sale-banner">
                         <a class="hover_effect1" href="#">
-                            <img src="{{asset('/')}}frontend/assets/images/shop_banner_img6.jpg" alt="shop_banner_img6">
+                            <img src="{{asset('/')}}frontend/assets/images/shop_banner_img6.png" alt="shop_banner_img6">
                         </a>
                     </div>
                 </div>
@@ -53,6 +109,16 @@
                                 <div class="tab-pane fade show active" id="featured" role="tabpanel" aria-labelledby="featured-tab">
                                     <div class="product_slider carousel_slider owl-carousel owl-theme dot_style1" data-loop="true" data-margin="20" data-responsive='{"0":{"items": "1"}, "481":{"items": "2"}, "768":{"items": "3"}, "991":{"items": "4"}}'>
                                         @foreach ($featured as $featur)
+                                        {{-- Calculate Variables for Price, Color & Size --}}
+                                            @php
+                                                $sellingPrice = (float) $featur->selling_price;
+                                                $discountPrice = $featur->discount_price ? (float) $featur->discount_price : null;
+                                                $finalPrice = $discountPrice ? $discountPrice : $sellingPrice;
+
+                                                // Optional Chaining (?->) ব্যবহার করায় null হলেও ক্র্যাশ করবে না
+                                                $defaultColor = $featur->colors?->first()?->color_name ?? '';
+                                                $defaultSize  = $featur->sizes?->first()?->size_name ?? '';
+                                            @endphp
                                             <div class="item">
                                                 <div class="product_wrap">
                                                     <span class="pr_flash bg-danger">Hot</span>
@@ -94,9 +160,13 @@
                                                         </a>
                                                         <div class="product_action_box">
                                                             <ul class="list_none pr_action_btn">
-                                                                <li class="add-to-cart"><a href="#"><i class="icon-basket-loaded"></i> Add To Cart</a></li>
-                                                                <li><a href="shop-compare.html" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                                                <li><a href="#" id="{{$featur->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
+                                                                <li class="add-to-cart">
+                                                                    <a href="javascript:void(0);" class="add-to-cart" data-id="{{ $featur->id }}" data-price="{{ $finalPrice }}" data-color="{{ $defaultColor }}" data-size="{{ $defaultSize }}" data-qty="1">
+                                                                        <i class="icon-basket-loaded"></i> Add To Cart
+                                                                    </a>
+                                                                </li>
+                                                                <li><a href="javascript:void(0)" onclick="addToCompare({{ $featur->id }})" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
+                                                                <li><a href="javascript:void(0)" id="{{$featur->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
                                                                 <li><a href="{{ route('wishlist.add', $featur->id) }}"><i class="icon-heart"></i></a></li>
                                                             </ul>
                                                         </div>
@@ -136,18 +206,36 @@
                                 <div class="tab-pane fade" id="mostpopular" role="tabpanel" aria-labelledby="most-popular-tab">
                                     <div class="product_slider carousel_slider owl-carousel owl-theme dot_style1" data-loop="true" data-margin="20" data-responsive='{"0":{"items": "1"}, "481":{"items": "2"}, "768":{"items": "3"}, "991":{"items": "4"}}'>
                                         @foreach ($popular_product as $product)
+                                            @php
+                                                $sellingPrice = (float) $product->selling_price;
+                                                $discountPrice = $product->discount_price ? (float) $product->discount_price : null;
+                                                $finalPrice = $discountPrice ? $discountPrice : $sellingPrice;
+
+                                                $defaultColor = $product->colors?->first()?->color_name ?? '';
+                                                $defaultSize  = $product->sizes?->first()?->size_name ?? '';
+                                                $popularColor = $product->colors?->first();
+                                            @endphp
                                             <div class="item">
                                                 <div class="product_wrap">
                                                     <div class="product_img">
                                                         <a href="{{ route('product.details', $product->product_slug) }}">
-                                                            <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->product_name }}">
-                                                            <img class="product_hover_img" src="{{ asset($product->thumbnail) }}" alt="{{ $product->product_name }} Hover Image">
+                                                            @if($popularColor && $popularColor->thumbnail)
+                                                                <img src="{{ asset($popularColor->thumbnail) }}" alt="{{ $product->product_name }}">
+                                                                <img class="product_hover_img" src="{{ asset($popularColor->thumbnail) }}" alt="{{ $product->product_name }} Hover Image">
+                                                            @else
+                                                                <img src="{{ asset('frontend/assets/images/no-image.png') }}" alt="{{ $product->product_name }}">
+                                                                <img class="product_hover_img" src="{{ asset('frontend/assets/images/no-image.png') }}" alt="{{ $product->product_name }} Hover Image">
+                                                            @endif
                                                         </a>
                                                         <div class="product_action_box">
                                                             <ul class="list_none pr_action_btn">
-                                                                <li class="add-to-cart"><a href="#"><i class="icon-basket-loaded"></i> Add To Cart</a></li>
-                                                                <li><a href="shop-compare.html" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                                                <li><a href="#" id="{{$product->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
+                                                                <li class="add-to-cart">
+                                                                    <a href="javascript:void(0);" class="add-to-cart" data-id="{{ $product->id }}" data-price="{{ $finalPrice }}" data-color="{{ $defaultColor }}" data-size="{{ $defaultSize }}" data-qty="1">
+                                                                        <i class="icon-basket-loaded"></i> Add To Cart
+                                                                    </a>
+                                                                </li>
+                                                                <li><a href="javascript:void(0)" onclick="addToCompare({{ $product->id }})" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
+                                                                <li><a href="javascript:void(0)" id="{{$product->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
                                                                 <li><a href="{{ route('wishlist.add', $product->id) }}"><i class="icon-heart"></i></a></li>
                                                             </ul>
                                                         </div>
@@ -161,8 +249,6 @@
                                                                 <span class="price">{{ $setting->currency }}{{ number_format((float) $product->discount_price, 2) }}</span>
                                                                 <del>{{ $setting->currency }}{{ number_format((float) $product->selling_price, 2) }}</del>
                                                                 @php
-                                                                    $sellingPrice = (float) $product->selling_price;
-                                                                    $discountPrice = (float) $product->discount_price;
                                                                     $discount = round(($sellingPrice - $discountPrice) / $sellingPrice * 100);
                                                                 @endphp
                                                                 <br>
@@ -171,7 +257,6 @@
                                                                 </div>
                                                             @endif
                                                         </div>
-                                                        
                                                         <div class="rating_wrap">
                                                             <div class="rating">
                                                                 <div class="product_rate" style="width:{{ ($product->averageRating / 5) * 100 }}%"></div>
@@ -182,7 +267,6 @@
                                                 </div>
                                             </div>
                                         @endforeach
-                                        
                                     </div>
                                 </div>
                 
@@ -199,27 +283,58 @@
     <div class="section pb_20 small_pt">
         <div class="custom-container">
             <div class="row">
-                <div class="col-md-4">
-                    <div class="sale-banner mb-3 mb-md-4">
-                        <a class="hover_effect1" href="#">
-                            <img src="{{asset('/')}}frontend/assets/images/shop_banner_img7.jpg" alt="shop_banner_img7">
-                        </a>
+                @php
+                    // Category theke 3-ti ads newa hocche
+                    $homeBanners = $categories->flatMap->ads->take(3);
+                    
+                    // Default image list
+                    $defaultImages = [
+                        'frontend/assets/images/shop_banner_img7.jpg',
+                        'frontend/assets/images/shop_banner_img8.jpg',
+                        'frontend/assets/images/shop_banner_img9.jpg',
+                    ];
+                @endphp
+
+                @for($i = 0; $i < 3; $i++)
+                    @php
+                        $banner = $homeBanners[$i] ?? null;
+                        $imageUrl = $banner ? asset($banner->image) : asset($defaultImages[$i]);
+                        
+                        // Shudhu Category Name display hobe
+                        $categoryName = $banner->category->category_name ?? $banner->category->name ?? ($categories[$i]->category_name ?? 'Category');
+                        
+                        // Route Link
+                        $targetLink = route('slug.handler', $banner->category->category_slug ?? $banner->category->slug ?? ($categories[$i]->category_slug ?? $categories[$i]->slug ?? ''));
+                    @endphp
+
+                    <div class="col-md-4">
+                        <div class="sale-banner mb-3 mb-md-4 position-relative">
+                            <a class="hover_effect1" href="{{ $targetLink }}">
+                                <img src="{{ $imageUrl }}" alt="{{ $categoryName }}">
+                            </a>
+
+                            {{-- Dan Pashe Upor-Nich Align Ebong Boro Font --}}
+                            <div class="banne_info" style="position: absolute; top: 50%; right: 20px; transform: translateY(-50%); z-index: 2; max-width: 55%; text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
+                                @if($banner && $banner->discount_text)
+                                    <h6 style="font-size: 16px; margin-bottom: 4px; color: #333; font-weight: 600; display: block;">{{ $banner->discount_text }}</h6>
+                                @else
+                                    <h6 style="font-size: 16px; margin-bottom: 4px; color: #333; font-weight: 600; display: block;">20% Off</h6>
+                                @endif
+
+                                {{-- Category Name --}}
+                                <h4 style="font-size: 22px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; color: #111; display: block; word-wrap: break-word; white-space: normal;">
+                                    {{ $categoryName }}
+                                </h4>
+
+                                {{-- Dynamic Shop Now Route --}}
+                                <a href="{{ $targetLink }}" style="font-size: 14px; font-weight: bold; text-decoration: underline; display: inline-block;">
+                                    Shop Now
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="sale-banner mb-3 mb-md-4">
-                        <a class="hover_effect1" href="#">
-                            <img src="{{asset('/')}}frontend/assets/images/shop_banner_img8.jpg" alt="shop_banner_img8">
-                        </a>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="sale-banner mb-3 mb-md-4">
-                        <a class="hover_effect1" href="#">
-                            <img src="{{asset('/')}}frontend/assets/images/shop_banner_img9.jpg" alt="shop_banner_img9">
-                        </a>
-                    </div>
-                </div>
+                @endfor
+
             </div>
         </div>
     </div>
@@ -553,25 +668,57 @@
                         </a>
                     </div>
                 </div> --}}
-                @if($trendy_product_new)
+                
+                @if(isset($trendy_product_new) && $trendy_product_new)
+                    @php
+                        // Dynamic Image Logic
+                        $bannerImage = $trendy_product_new->colors?->first()?->thumbnail 
+                                    ?? $trendy_product_new->thumbnail 
+                                    ?? $trendy_product_new->product_thambnail 
+                                    ?? null;
+
+                        if ($bannerImage && str_starts_with($bannerImage, 'public/')) {
+                            $bannerImage = substr($bannerImage, 7);
+                        }
+                    @endphp
+
                     <div class="col-xl-3 d-none d-xl-block">
                         <div class="banner">
-                            <div class="discount">
-                                @if ($trendy_product_new->discount_price == null)
-                                    @else
-                                        @php
-                                            $sellingPrice = (float) $product->selling_price;
-                                            $discountPrice = (float) $product->discount_price;
-                                            $discount = round(($sellingPrice - $discountPrice) / $sellingPrice * 100);
-                                        @endphp
-                                        Up to {{ $discount }} % Off
-                                @endif
-                            </div>
+                            {{-- Discount Calculation --}}
+                            @if (!empty($trendy_product_new->discount_price) && $trendy_product_new->selling_price > 0)
+                                @php
+                                    $sellingPrice = (float) $trendy_product_new->selling_price;
+                                    $discountPrice = (float) $trendy_product_new->discount_price;
+                                    $discount = round((($sellingPrice - $discountPrice) / $sellingPrice) * 100);
+                                @endphp
+                                <div class="discount">
+                                    Up to {{ $discount }}% Off
+                                </div>
+                            @endif
+
                             <h1>New Collection</h1>
-                            <a href="{{ route('product.details', $trendy_product_new->product_slug) }}" class="shop-now">Shop Now →</a>
-                            <img src="{{ asset($trendy_product_new->thumbnail) }}" alt="img" class="product-image"> 
+                            
+                            {{-- Shop Now Link --}}
+                            <a href="{{ route('product.details', $trendy_product_new->product_slug ?? '#') }}" class="shop-now">
+                                Shop Now →
+                            </a>
+
+                            {{-- Product Banner Image (Shorter Size & Blended Background) --}}
+                            @if(!empty($bannerImage))
+                                <img src="{{ asset($bannerImage) }}" 
+                                    alt="{{ $trendy_product_new->product_name ?? 'Product Image' }}" 
+                                    class="product-image"
+                                    style="max-width: 75%; height: auto; display: block; margin: 15px auto; mix-blend-mode: multiply; object-fit: contain;">
+                            @else
+                                <img src="{{ asset('frontend/assets/images/no-image.png') }}" 
+                                    alt="No Image" 
+                                    class="product-image"
+                                    style="max-width: 75%; height: auto; display: block; margin: 15px auto; mix-blend-mode: multiply; object-fit: contain;">
+                            @endif
+
+                            {{-- Category Name --}}
                             <div class="vertical-text">
-                                {{ $trendy_product_new->childcategory->childcategory_name ?? 'No Category' }}
+                                {{ $trendy_product_new->category?->category_name ?? 'New Collection' }}
                             </div>
                         </div>
                     </div>
@@ -584,63 +731,73 @@
                                     <h4>Trending products</h4>
                                 </div>
                                 <div class="view_all">
-                                    <a href="#" class="text_default"><i class="linearicons-power"></i> <span>View All</span></a>
+                                    <a href="{{ route('trending.products') }}" class="text_default">
+                                        <i class="linearicons-power"></i> <span>View All</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <div class="product_slider carousel_slider owl-carousel owl-theme dot_style1" data-loop="true" data-margin="20" data-responsive='{"0":{"items": "1"}, "481":{"items": "2"}, "768":{"items": "3"}, "991":{"items": "4"}}'>
-                                @foreach ($trendy_product as $product )
-                                
-                                    <div class="item">
-                                        <div class="product_wrap">
-                                            <div class="product_img">
-                                                <a href="{{ route('product.details', $product->product_slug) }}">
-                                                    <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->product_name }}">
-                                                    <img class="product_hover_img" src="{{ asset($product->thumbnail) }}" alt="{{ $product->product_name }} Hover Image">
-                                                </a>
-                                                <div class="product_action_box">
-                                                    <ul class="list_none pr_action_btn">
-                                                        <li class="add-to-cart"><a href="#"><i class="icon-basket-loaded"></i> Add To Cart</a></li>
-                                                        <li><a href="shop-compare.html" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                                        <li><a href="#" id="{{$product->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
-                                                        <li><a href="{{ route('wishlist.add', $product->id) }}"><i class="icon-heart"></i></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="product_info">
-                                                <h6 class="product_title"><a href="{{ route('product.details', $product->product_slug) }}">{{ $product->product_name }}</a></h6>
-                                                <div class="product_price">
-                                                    @if ($product->discount_price == null)
-                                                        <span class="price">{{ $setting->currency }}{{ number_format((float) $product->selling_price, 2) }}</span>
-                                                    @else
-                                                        <span class="price">{{ $setting->currency }}{{ number_format((float) $product->discount_price, 2) }}</span>
-                                                        <del>{{ $setting->currency }}{{ number_format((float) $product->selling_price, 2) }}</del>
-                                                        @php
-                                                            $sellingPrice = (float) $product->selling_price;
-                                                            $discountPrice = (float) $product->discount_price;
-                                                            $discount = round(($sellingPrice - $discountPrice) / $sellingPrice * 100);
-                                                        @endphp
-                                                        <br>
-                                                        <div class="on_sale">
-                                                            <span>{{ $discount }}% Off</span>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                                
-                                                <div class="rating_wrap">
-                                                    <div class="rating">
-                                                        <div class="product_rate" style="width:{{ ($product->averageRating / 5) * 100 }}%"></div>
+                            @if(isset($trendy_product) && count($trendy_product) > 0)
+                                <div class="product_slider carousel_slider owl-carousel owl-theme dot_style1" data-loop="false" data-margin="20" data-responsive='{"0":{"items": "1"}, "481":{"items": "2"}, "768":{"items": "3"}, "991":{"items": "4"}}'>
+                                    @foreach ($trendy_product as $product)
+                                        @php
+                                            
+                                            $primaryImage = null;
+                                            if (isset($product->colors) && count($product->colors) > 0 && !empty($product->colors->first()->thumbnail)) {
+                                                $primaryImage = $product->colors->first()->thumbnail;
+                                            } else {
+                                                $primaryImage = $product->thumbnail;
+                                            }
+
+                                            $sellingPrice = (float) $product->selling_price;
+                                            $discountPrice = $product->discount_price ? (float) $product->discount_price : null;
+                                        @endphp
+                                        <div class="item">
+                                            <div class="product_wrap">
+                                                <div class="product_img">
+                                                    <a href="{{ route('product.details', $product->product_slug) }}">
+                                                        @if(!empty($primaryImage))
+                                                            <img src="{{ asset($primaryImage) }}" alt="{{ $product->product_name }}">
+                                                        @else
+                                                            <img src="{{ asset('frontend/assets/images/no-image.png') }}" alt="No Image">
+                                                        @endif
+                                                    </a>
+                                                    <div class="product_action_box">
+                                                        <ul class="list_none pr_action_btn">
+                                                            <li class="add-to-cart"><a href="#"><i class="icon-basket-loaded"></i> Add To Cart</a></li>
+                                                            <li><a href="shop-compare.html" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
+                                                            <li><a href="#" id="{{ $product->id }}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
+                                                            <li><a href="{{ route('wishlist.add', $product->id) }}"><i class="icon-heart"></i></a></li>
+                                                        </ul>
                                                     </div>
-                                                    <span class="rating_num">({{ $product->reviewCount }})</span>
+                                                </div>
+                                                <div class="product_info">
+                                                    <h6 class="product_title"><a href="{{ route('product.details', $product->product_slug) }}">{{ $product->product_name }}</a></h6>
+                                                    <div class="product_price">
+                                                        @if ($discountPrice == null)
+                                                            <span class="price">{{ $setting->currency ?? '$' }}{{ number_format($sellingPrice, 2) }}</span>
+                                                        @else
+                                                            <span class="price">{{ $setting->currency ?? '$' }}{{ number_format($discountPrice, 2) }}</span>
+                                                            <del>{{ $setting->currency ?? '$' }}{{ number_format($sellingPrice, 2) }}</del>
+                                                        @endif
+                                                    </div>
+                                                    <div class="rating_wrap">
+                                                        <div class="rating">
+                                                            <div class="product_rate" style="width:{{ (($product->averageRating ?? 0) / 5) * 100 }}%"></div>
+                                                        </div>
+                                                        <span class="rating_num">({{ $product->reviewCount ?? 0 }})</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @endforeach
-                            </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-center p-3">No Trending Products Found</p>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -648,45 +805,21 @@
         </div>
     </div>
     <!-- END SECTION SHOP -->
-    <!-- START Category List-->
-    <div class="section pt-0 small_pb">
-        <div class="custom-container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="heading_tab_header">
-                        <div class="heading_s2">
-                            <h4>Our Categorys</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="client_logo carousel_slider owl-carousel owl-theme nav_style3" data-dots="false" data-nav="true" data-margin="30" data-loop="true" data-autoplay="true" data-responsive='{"0":{"items": "2"}, "480":{"items": "3"}, "767":{"items": "4"}, "991":{"items": "5"}, "1199":{"items": "6"}}'>
-                        @foreach ($categories as $category)
-                            <div class="item">
-                                <div class="cl_logo" style="text-align: center;">
-                                    <i class="{{ $category->icon }}" style="font-size: 3em;"></i>
-                                    <span style="display: block; margin-top: 10px;">{{ $category->category_name }}</span>
-                                </div>
-                            </div> 
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-    </div>
-    <!-- END Category List  -->
+
     <!-- Home Category Wise product -->
     @foreach($home_category as $home)
-    @php
-        $cat_product=App\Models\product::where('category_id',$home->id)->orderBy('id','DESC')->limit(24)->get();
-        foreach ($cat_product as $product) {
-            $product->reviewCount = App\Models\review::where('product_id', $product->id)->count();
-            $product->averageRating = App\Models\review::where('product_id', $product->id)->avg('rating');
-        }
-    @endphp
+        @php
+            $cat_product = App\Models\product::where('category_id', $home->id)
+                ->orderBy('id', 'ASC')
+                ->limit(24)
+                ->get();
+
+            foreach ($cat_product as $product) {
+                $product->reviewCount = App\Models\review::where('product_id', $product->id)->count();
+                $product->averageRating = App\Models\review::where('product_id', $product->id)->avg('rating');
+            }
+        @endphp
+
         <div class="section small_pt small_pb">
             <div class="custom-container">
                 <div class="row">
@@ -695,30 +828,51 @@
                             <div class="col-12">
                                 <div class="heading_tab_header">
                                     <div class="heading_s2">
-                                        <h4>{{$home->category_name }}</h4>
+                                        <h4>{{ $home->category_name }}</h4>
                                     </div>
                                     <div class="view_all">
-                                        <a href="#" class="text_default"><i class="linearicons-power"></i> <span>View All</span></a>
+                                        <a href="{{ route('slug.handler', $home->category_slug) }}" class="text_default">
+                                            <i class="linearicons-power"></i> <span>View All</span>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <div class="product_slider carousel_slider owl-carousel owl-theme dot_style1" data-loop="true" data-margin="20" data-responsive='{"0":{"items": "1"},"210":{"items": "2"} ,"481":{"items": "3"}, "768":{"items": "4"}, "991":{"items": "5"}}' >
+                                <div class="product_slider carousel_slider owl-carousel owl-theme dot_style1" data-loop="true" data-margin="20" data-responsive='{"0":{"items": "1"},"210":{"items": "2"} ,"481":{"items": "3"}, "768":{"items": "4"}, "991":{"items": "5"}}'>
                                     @foreach ($cat_product as $product)
+                                        @php
+                                            $imgSrc = $product->thumbnail 
+                                                    ?? $product->product_thambnail 
+                                                    ?? $product->colors?->first()?->thumbnail 
+                                                    ?? $product->image 
+                                                    ?? null;
+
+                                            if ($imgSrc) {
+                                                
+                                                if (str_starts_with($imgSrc, 'public/')) {
+                                                    $imgSrc = substr($imgSrc, 7);
+                                                }
+                                                $finalImage = asset($imgSrc);
+                                            } else {
+                                                
+                                                $finalImage = asset('frontend/assets/images/no-image.png');
+                                            }
+                                        @endphp
+
                                         <div class="item">
                                             <div class="product_wrap">
                                                 <div class="product_img">
                                                     <a href="{{ route('product.details', $product->product_slug) }}">
-                                                        <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->product_name }}">
-                                                        <img class="product_hover_img" src="{{ asset($product->thumbnail) }}" alt="{{ $product->product_name }} Hover Image">
+                                                        <img src="{{ $finalImage }}" alt="{{ $product->product_name }}">
+                                                        <img class="product_hover_img" src="{{ $finalImage }}" alt="{{ $product->product_name }} Hover Image">
                                                     </a>
                                                     <div class="product_action_box">
                                                         <ul class="list_none pr_action_btn">
                                                             <li class="add-to-cart"><a href="#"><i class="icon-basket-loaded"></i> Add To Cart</a></li>
                                                             <li><a href="shop-compare.html" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                                            <li><a href="#" id="{{$product->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
+                                                            <li><a href="#" id="{{ $product->id }}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
                                                             <li><a href="{{ route('wishlist.add', $product->id) }}"><i class="icon-heart"></i></a></li>
                                                         </ul>
                                                     </div>
@@ -783,7 +937,7 @@
                             <div class="item">
                                 <div class="cl_logo">
                                     <a href="" title="{{$brand->brand_name}}">
-                                        <img src="{{asset($brand->brand_logo)}}" alt="{{$brand->brand_name}}"/>
+                                        <img src="{{asset($brand->brand_logo)}}" alt="{{$brand->brand_name}}" style="width: 163px; height: 85px; object-fit: contain; display: block; margin: 0 auto;"/>
                                     </a>
                                     
                                 </div>

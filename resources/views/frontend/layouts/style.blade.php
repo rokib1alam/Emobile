@@ -3,7 +3,7 @@
 <!-- Animation CSS -->
 <link rel="stylesheet" href="{{asset('/')}}frontend/assets/css/animate.css">
 <!-- Latest Bootstrap min CSS -->
-<link rel="stylesheet" href="{{asset('/')}}frontend/assets/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">

@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title','Shopwise|Product')
+@section('title','Product')
 @section('content')
 <!-- START HEADER -->
-@include('frontend.layouts.others_header')
+@include('frontend.layouts.nheader')
 <!-- END HEADER -->
 <!-- START SECTION BREADCRUMB -->
 <div class="breadcrumb_section bg_gray page-title-mini">
@@ -149,74 +149,93 @@
                     </div>
                 @endforeach --}}
                 @foreach ($products as $featur)
+                    @php
+                        $imgSrc = $featur->colors?->first()?->thumbnail 
+                                ?? $featur->thumbnail 
+                                ?? $featur->product_thambnail 
+                                ?? $featur->image 
+                                ?? null;
+
+                        if ($imgSrc) {
+                            
+                            if (str_starts_with($imgSrc, 'public/')) {
+                                $imgSrc = substr($imgSrc, 7);
+                            }
+                            $finalImage = asset($imgSrc);
+                        } else {
+                            
+                            $finalImage = asset('frontend/assets/images/no-image.png');
+                        }
+                    @endphp
+
                     <div class="col-md-4 col-6">
                         <div class="product_box text-center">
-                        <div class="product_img">
-                            <a href="{{ route('product.details', $featur->product_slug) }}">
-                            <img src="{{ asset($featur->thumbnail) }}" alt="{{ $featur->product_name }}">
-                            </a>
-                            <div class="product_action_box">
-                            <ul class="list_none pr_action_btn">
-                                <li>
-                                    <a href="javascript:void(0)" onclick="addToCompare({{ $featur->id }})" >
-                                        <i class="icon-shuffle"></i> Compare
-                                    </a>
-                                </li>
-                                <li><a href="#" id="{{$featur->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
-                                <li><a href="{{ route('wishlist.add', $featur->id) }}"><i class="icon-heart"></i></a></li>
-                            </ul>
-                            </div>
-                        </div>
-                        <div class="product_info">
-                            <h6 class="product_title">
-                            <a href="{{ route('product.details', $featur->product_slug) }}">{{ $featur->product_name }}</a>
-                            </h6>
-                            <div class="product_price">
-                            @if ($featur->discount_price == null)
-                                <span class="price">{{ $setting->currency }}{{ number_format((float) $featur->selling_price, 2) }}</span>
-                            @else
-                                <span class="price">{{ $setting->currency }}{{ number_format((float) $featur->discount_price, 2) }}</span>
-                                <del>{{ $setting->currency }}{{ number_format((float) $featur->selling_price, 2) }}</del>
-                                @php
-                                $sellingPrice = (float) $featur->selling_price;
-                                $discountPrice = (float) $featur->discount_price;
-                                $discount = round(($sellingPrice - $discountPrice) / $sellingPrice * 100);
-                                @endphp
-                                <br>
-                                <div class="on_sale">
-                                <span>{{ $discount }}% Off</span>
+                            <div class="product_img">
+                                <a href="{{ route('product.details', $featur->product_slug) }}">
+                                    <img src="{{ $finalImage }}" alt="{{ $featur->product_name }}">
+                                </a>
+                                <div class="product_action_box">
+                                    <ul class="list_none pr_action_btn">
+                                        <li>
+                                            <a href="javascript:void(0)" onclick="addToCompare({{ $featur->id }})">
+                                                <i class="icon-shuffle"></i> Compare
+                                            </a>
+                                        </li>
+                                        <li><a href="#" id="{{$featur->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
+                                        <li><a href="{{ route('wishlist.add', $featur->id) }}"><i class="icon-heart"></i></a></li>
+                                    </ul>
                                 </div>
-                            @endif
                             </div>
-                            <div class="rating_wrap">
-                            <div class="rating">
-                                <div class="product_rate" style="width:{{ ($featur->averageRating / 5) * 100 }}%"></div>
-                            </div>
-                            <span class="rating_num">({{ $featur->reviewCount }})</span>
-                            </div>
-                            <div class="pr_desc">
-                            <p>{{ Str::limit($featur->short_description ?? 'No description available', 100) }}</p>
-                            </div>
-                        @php
-                            $sizes = explode(',', $featur->size);
-                            $colors = explode(',', $featur->color);
-                            $defaultSize = $sizes[0] ?? '';
-                            $defaultColor = $colors[0] ?? '';
-                            $price = $featur->discount_price ?? $featur->selling_price;
-                        @endphp
+                            <div class="product_info">
+                                <h6 class="product_title">
+                                    <a href="{{ route('product.details', $featur->product_slug) }}">{{ $featur->product_name }}</a>
+                                </h6>
+                                <div class="product_price">
+                                    @if ($featur->discount_price == null)
+                                        <span class="price">{{ $setting->currency }}{{ number_format((float) $featur->selling_price, 2) }}</span>
+                                    @else
+                                        <span class="price">{{ $setting->currency }}{{ number_format((float) $featur->discount_price, 2) }}</span>
+                                        <del>{{ $setting->currency }}{{ number_format((float) $featur->selling_price, 2) }}</del>
+                                        @php
+                                            $sellingPrice = (float) $featur->selling_price;
+                                            $discountPrice = (float) $featur->discount_price;
+                                            $discount = round(($sellingPrice - $discountPrice) / $sellingPrice * 100);
+                                        @endphp
+                                        <br>
+                                        <div class="on_sale">
+                                            <span>{{ $discount }}% Off</span>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="rating_wrap">
+                                    <div class="rating">
+                                        <div class="product_rate" style="width:{{ ($featur->averageRating / 5) * 100 }}%"></div>
+                                    </div>
+                                    <span class="rating_num">({{ $featur->reviewCount }})</span>
+                                </div>
+                                <div class="pr_desc">
+                                    <p>{{ Str::limit($featur->short_description ?? 'No description available', 100) }}</p>
+                                </div>
+                                @php
+                                    $sizes = explode(',', $featur->size);
+                                    $colors = explode(',', $featur->color);
+                                    $defaultSize = $sizes[0] ?? '';
+                                    $defaultColor = $colors[0] ?? '';
+                                    $price = $featur->discount_price ?? $featur->selling_price;
+                                @endphp
 
-                        <div class="add-to-cart">
-                            <button class="btn btn-fill-out btn-radius add-to-cart"
-                                    data-id="{{ $featur->id }}"
-                                    data-price="{{ $featur->discount_price ?? $featur->selling_price }}"
-                                    data-color="{{ explode(',', $featur->color)[0] ?? '' }}"
-                                    data-size="{{ explode(',', $featur->size)[0] ?? '' }}"
-                                    data-qty="1">
-                                <i class="icon-basket-loaded"></i> Add To Cart
-                            </button>
-                        </div>
+                                <div class="add-to-cart">
+                                    <button class="btn btn-fill-out btn-radius add-to-cart"
+                                            data-id="{{ $featur->id }}"
+                                            data-price="{{ $featur->discount_price ?? $featur->selling_price }}"
+                                            data-color="{{ $colors[0] ?? '' }}"
+                                            data-size="{{ $sizes[0] ?? '' }}"
+                                            data-qty="1">
+                                        <i class="icon-basket-loaded"></i> Add To Cart
+                                    </button>
+                                </div>
 
-                        </div>
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -272,8 +291,8 @@
                             <li>
                                 <div class="custome-checkbox">
                                     <input class="form-check-input" type="checkbox" id="brand_{{ $brand->id }}" name="brands[]" value="{{ $brand->id }}">
-                                    <label class="form-check-label" for="brand_{{ $brand->id }}">
-                                        <span>{{ $brand->brand_name }}</span>
+                                    <label class="form-check-label" for="brand_{{ $brand->id}}">
+                                        <span>{{ $brand->brand_name}}</span>
                                     </label>
                                 </div>
                             </li>

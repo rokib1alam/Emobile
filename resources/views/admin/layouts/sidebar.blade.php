@@ -96,6 +96,11 @@
                                 href="{{route('childcategory.index')}}">Childcategories</a>
                             </li>
                         @endcan
+                        @can('view ads')
+                            <li class="pc-item"><a class="pc-link"
+                                href="{{route('ads.index')}}">Ads Manager</a>
+                            </li>
+                        @endcan
                         @can('view brand')
                             <li class="pc-item"><a class="pc-link"
                                 href="{{route('brand.index')}}">Brand</a>

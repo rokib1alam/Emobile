@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\RegisteredAdminController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\AdsManagerController;
 use App\Http\Controllers\Admin\CampaingController;
 use App\Http\Controllers\Admin\CategorieController;
 use App\Http\Controllers\Admin\ChildcategorieController;
@@ -67,6 +68,7 @@ Route::prefix('admin')->middleware(['auth:admin', 'role:super-admin|admin'])->gr
     Route::resource('childcategory', ChildcategorieController::class)->except(['show', 'create']);
     Route::resource('campaing', CampaingController::class)->except(['show', 'create']);
     Route::resource('brand', BrandController::class)->except(['show', 'create']);
+    Route::resource('ads', AdsManagerController::class)->except(['show', 'create']);
 
     Route::resource('warehouse', WarehouseController::class)->except(['show', 'create']);
     Route::resource('coupon', CouponController::class)->except(['show', 'create']);

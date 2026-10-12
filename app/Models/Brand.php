@@ -27,7 +27,7 @@ class Brand extends Model
         //Reading Upload imageFrom Local File system (uploads)
         $imageUrl = $imageManager->read(self::$directory .self::$imageName);
         //Resize the image
-        $imageUrl->resize(240, 240); // Resize to 2, adjust as needed
+        $imageUrl->resize(163, 85); // Resize to 2, adjust as needed
         $imageUrl->save(self::$directory. self::$imageName);
         self::$imageUrl = self::$directory . self::$imageName;
         return self::$imageUrl;

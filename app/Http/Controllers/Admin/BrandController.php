@@ -52,7 +52,7 @@ class BrandController extends BaseController
                     if (auth('admin')->user()->can('delete brand')) {
                         $actionBtn .= '<button class="btn btn-danger btn-sm delete" data-id="' . $row->id . '">
                             <i class="fa fa-trash"></i></button>
-                            <form id="delete-form-' . $row->id . '" action="' . route('delivery.destroy', $row->id) . '" method="POST" style="display: none;">
+                            <form id="delete-form-' . $row->id . '" action="' . route('brand.destroy', $row->id) . '" method="POST" style="display: none;">
                                 ' . csrf_field() . method_field('DELETE') . '
                             </form>';
                     }

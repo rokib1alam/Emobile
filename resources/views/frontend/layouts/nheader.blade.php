@@ -131,191 +131,68 @@
 
                 {{-- RIGHT ICONS --}}
                 <ul class="navbar-nav attr-nav align-items-center">
-
                     {{-- USER --}}
                     <li>
                         @if(Auth::check())
-
                             <a href="{{ route('dashboard') }}"
                                class="nav-link">
-
                                 @if(Auth::user()->image)
 
                                     <img src="{{ asset(Auth::user()->image) }}"
                                          alt="{{ Auth::user()->name }}"
                                          style="width:30px;height:30px;border-radius:50%;object-fit:cover;">
-
                                 @else
-
                                     <i class="linearicons-user"></i>
-
                                 @endif
-
                             </a>
-
                         @else
-
                             <a href="{{ route('login') }}"
                                class="nav-link">
-
                                 <i class="linearicons-user"></i>
-
                             </a>
-
                         @endif
                     </li>
-
-
                     {{-- WISHLIST --}}
-                    @php
-                        $wishlist = Auth::check()
-                            ? \App\Models\Wishlist::where('user_id', Auth::id())->count()
-                            : 0;
-                    @endphp
-
-                    <li>
-                        <a href="{{ route('wishlist') }}"
-                           class="nav-link">
-
-                            <i class="linearicons-heart"></i>
-
-                            <span class="wishlist_count">
-                                {{ $wishlist }}
-                            </span>
-
-                        </a>
-                    </li>
-
-
+                        @php
+                            $wishlist= \App\Models\Wishlist::where('user_id', Auth::id())->count();
+                        @endphp
+                    <li><a href="{{ route('compare.page') }}"><i class="ti-control-shuffle"></i></a></li>
+                    <li><a href="{{ route('wishlist') }}" class="nav-link"><i class="linearicons-heart"></i><span class="wishlist_count">{{ $wishlist }}</span></a></li>
                     {{-- CART --}}
                     <li class="dropdown cart_dropdown">
-
-                        <a class="nav-link cart_trigger"
-                           href="{{ route('cart.view') }}"
-                           data-bs-toggle="dropdown">
-
-                            <i class="linearicons-bag2"></i>
-
-                            <span class="cart_count">
-                                {{ Cart::count() }}
-                            </span>
-
-                            <span class="amount">
-                                <span class="currency_symbol">
-                                    {{ $setting->currency }}
+                            <a class="nav-link cart_trigger" href="#" data-bs-toggle="dropdown">
+                                <i class="linearicons-bag2"></i>
+                                <span class="cart_count" id="cart-count">{{ Cart::count() }}</span>
+                                <span class="amount" id="cart-total">
+                                    <span class="currency_symbol">{{ $setting->currency }}</span>{{ Cart::subtotal() }}
                                 </span>
-                                {{ Cart::subtotal() }}
-                            </span>
-
-                        </a>
-
-
-                        {{-- CART DROPDOWN --}}
-                        <div class="cart_box cart_right dropdown-menu dropdown-menu-right">
-
-                            <ul class="cart_list">
-
-                                @forelse(Cart::content() as $item)
-
-                                    <li>
-
-                                        {{-- REMOVE --}}
-                                        <a href="{{ route('cart.remove', $item->rowId) }}"
-                                           class="item_remove remove-cart-item"
-                                           data-id="{{ $item->rowId }}">
-
-                                            <i class="ion-close"></i>
-
-                                        </a>
-
-
-                                        {{-- PRODUCT --}}
-                                        <a href="#">
-
-                                            <img src="{{ asset($item->options->thumbnail) }}"
-                                                 alt="{{ $item->name }}">
-
-                                            {{ $item->name }}
-
-                                        </a>
-
-
-                                        {{-- QUANTITY + PRICE --}}
-                                        <span class="cart_quantity">
-
-                                            {{ $item->qty }} x
-
-                                            <span class="cart_amount">
-
-                                                <span class="price_symbole">
-                                                    {{ $setting->currency }}
-                                                </span>
-
-                                            </span>
-
-                                            {{ $item->price }}
-
-                                        </span>
-
-                                    </li>
-
-                                @empty
-
-                                    <li class="text-center py-3">
-                                        Your cart is empty.
-                                    </li>
-
-                                @endforelse
-
-                            </ul>
-
-
-                            {{-- CART FOOTER --}}
-                            @if(Cart::count() > 0)
+                            </a>
+                            
+                            <div class="cart_box cart_right dropdown-menu dropdown-menu-right">
+                                <ul id="cart-list" class="cart_list">
+                                    @forelse(Cart::content() as $item)
+                                        <li>
+                                            <a href="javascript:void(0);" class="item_remove remove-cart-item" data-id="{{ $item->rowId }}"><i class="ion-close"></i></a>
+                                            <a href="#">
+                                                <img src="{{ asset($item->options->thumbnail) }}" alt="cart_thumb">
+                                                {{ Str::limit($item->name, 20) }}
+                                            </a>
+                                            <span class="cart_quantity">{{ $item->qty }} x <span class="cart_amount"><span class="price_symbole">{{ $setting->currency }}</span>{{ $item->price }}</span></span>
+                                        </li>
+                                    @empty
+                                        <li>No items in cart.</li>
+                                    @endforelse
+                                </ul>
 
                                 <div class="cart_footer">
-
-                                    <p class="cart_total">
-
-                                        <strong>
-                                            Subtotal:
-                                        </strong>
-
-                                        <span class="cart_price">
-
-                                            <span class="price_symbole">
-                                                {{ $setting->currency }}
-                                            </span>
-
-                                            {{ Cart::subtotal() }}
-
-                                        </span>
-
-                                    </p>
-
-
+                                    <p id="cart-total" style="text-align: center;"><strong>Subtotal:</strong> <span class="cart_price"><span class="price_symbole">{{ $setting->currency }}</span>{{ Cart::subtotal() }}</span></p>
                                     <p class="cart_buttons">
-
-                                        <a href="{{ route('cart.view') }}"
-                                           class="btn btn-fill-line view-cart">
-                                            View Cart
-                                        </a>
-
-                                        <a href="{{ route('checkout') }}"
-                                           class="btn btn-fill-out checkout">
-                                            Checkout
-                                        </a>
-
+                                        <a href="{{ route('cart.view') }}" class="btn btn-fill-line view-cart">View Cart</a>
+                                        <a href="{{ route('checkout') }}" class="btn btn-fill-out checkout">Checkout</a>
                                     </p>
-
                                 </div>
-
-                            @endif
-
-                        </div>
-
+                            </div>
                     </li>
-
                 </ul>
 
             </div>
@@ -339,12 +216,13 @@
                     <div class="categories_wrap">
 
                         <button type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#navCatContent"
+                                class="categories_btn categories_menu"
+                                data-toggle="collapse"
+                                data-target="#navCatContent"
                                 aria-expanded="false"
-                                class="categories_btn categories_menu">
+                                aria-controls="navCatContent">
 
-                            <span>All Categories </span>
+                            <span>All Categories</span>
                             <i class="linearicons-menu"></i>
 
                         </button>
@@ -352,163 +230,158 @@
 
                             <ul>
 
-                                @foreach($categories->take(6) as $category)
+                            @foreach($categories->take(6) as $category)
+                                <li class="dropdown dropdown-mega-menu">
 
-                                    <li class="dropdown dropdown-mega-menu">
+                                    {{-- CATEGORY HEADER --}}
+                                    <a class="nav-link" href="{{ route('slug.handler', $category->category_slug ?? $category->slug) }}">
+                                        <i class="{{ $category->icon }}"></i>
+                                        <span>{{ $category->category_name ?? $category->name }}</span>
+                                    </a>
 
-                                        {{-- CATEGORY --}}
-                                        <a class="nav-link"
-                                        href="{{ route('slug.handler', $category->category_slug) }}">
+                                    {{-- SUBCATEGORY + CHILD CATEGORY --}}
+                                    @if($category->subcategories->isNotEmpty())
+                                        <div class="dropdown-menu">
+                                            <ul class="mega-menu d-lg-flex">
 
-                                            <i class="{{ $category->icon }}"></i>
+                                                {{-- SUBCATEGORY LIST --}}
+                                                <li class="mega-menu-col col-lg-7">
+                                                    <ul class="d-lg-flex">
+                                                        @foreach($category->subcategories as $subcategory)
+                                                            <li class="mega-menu-col col-lg-6">
+                                                                <ul>
+                                                                    {{-- SUBCATEGORY --}}
+                                                                    <li class="dropdown-header">
+                                                                        <a href="{{ route('slug.handler', $subcategory->subcategory_slug ?? $subcategory->slug) }}"
+                                                                        class="text-decoration-none"
+                                                                        style="color: black;"
+                                                                        onmouseover="this.style.color='red';"
+                                                                        onmouseout="this.style.color='black';">
+                                                                            {{ $subcategory->subcategory_name ?? $subcategory->name }}
+                                                                        </a>
+                                                                    </li>
 
-                                            <span>{{ $category->category_name }}</span>
-
-                                        </a>
-
-
-                                        {{-- SUBCATEGORY + CHILD CATEGORY --}}
-                                        @if($category->subcategories->isNotEmpty())
-
-                                            <div class="dropdown-menu">
-
-                                                <ul class="mega-menu d-lg-flex">
-
-                                                    {{-- ========================= --}}
-                                                    {{-- SUBCATEGORY + CHILD CATEGORY --}}
-                                                    {{-- ========================= --}}
-
-                                                    <li class="mega-menu-col col-lg-7">
-
-                                                        <ul class="d-lg-flex">
-
-                                                            @foreach($category->subcategories as $subcategory)
-
-                                                                <li class="mega-menu-col col-lg-6">
-
-                                                                    <ul>
-
-                                                                        {{-- SUBCATEGORY --}}
-                                                                        <li class="dropdown-header">
-
-                                                                            <a href="{{ route('slug.handler', $subcategory->subcategory_slug) }}"
-                                                                            class="text-decoration-none"
-                                                                            style="color: black;"
-                                                                            onmouseover="this.style.color='red';"
-                                                                            onmouseout="this.style.color='black';">
-
-                                                                                {{ $subcategory->subcategory_name }}
-
-                                                                            </a>
-
-                                                                        </li>
-
-
-                                                                        {{-- CHILD CATEGORY --}}
-                                                                        @if($subcategory->childCategories->isNotEmpty())
-
-                                                                            @foreach($subcategory->childCategories as $childcategory)
-
-                                                                                <li>
-
-                                                                                    <a class="dropdown-item nav-link nav_item"
-                                                                                    href="{{ route('slug.handler', $childcategory->childcategory_slug) }}">
-
-                                                                                        {{ $childcategory->childcategory_name }}
-
-                                                                                    </a>
-
-                                                                                </li>
-
-                                                                            @endforeach
-
-                                                                        @else
-
-                                                                            {{-- NO CHILD CATEGORY --}}
+                                                                    {{-- CHILD CATEGORY --}}
+                                                                    @if($subcategory->childCategories->isNotEmpty())
+                                                                        @foreach($subcategory->childCategories as $childcategory)
                                                                             <li>
-
                                                                                 <a class="dropdown-item nav-link nav_item"
-                                                                                href="{{ route('slug.handler', $subcategory->subcategory_slug) }}">
-
-                                                                                    View All {{ $subcategory->subcategory_name }}
-
+                                                                                href="{{ route('slug.handler', $childcategory->childcategory_slug ?? $childcategory->slug) }}">
+                                                                                    {{ $childcategory->childcategory_name ?? $childcategory->name }}
                                                                                 </a>
-
                                                                             </li>
+                                                                        @endforeach
+                                                                    @else
+                                                                        <li>
+                                                                            <a class="dropdown-item nav-link nav_item"
+                                                                            href="{{ route('slug.handler', $subcategory->subcategory_slug ?? $subcategory->slug) }}">
+                                                                                View All {{ $subcategory->subcategory_name ?? $subcategory->name }}
+                                                                            </a>
+                                                                        </li>
+                                                                    @endif
+                                                                </ul>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
 
-                                                                        @endif
+                                                {{-- ========================= --}}
+                                                {{-- DYNAMIC CATEGORY BANNERS  --}}
+                                                {{-- ========================= --}}
+                                                <li class="mega-menu-col col-lg-5">
 
-                                                                    </ul>
+                                                    @php
+                                                        $banner1 = $category->ads->firstWhere('banner_position', '1');
+                                                        $banner2 = $category->ads->firstWhere('banner_position', '2');
+                                                        $categoryRoute = route('slug.handler', $category->category_slug ?? $category->slug);
+                                                    @endphp
 
-                                                                </li>
+                                                    {{-- BANNER 1 --}}
+                                                    @if($banner1)
+                                                        <div class="header-banner2 mb-3">
+                                                            <a href="{{ $categoryRoute }}">
+                                                                <img src="{{ asset($banner1->image) }}" alt="{{ $banner1->title }}">
+                                                            </a>
 
-                                                            @endforeach
-
-                                                        </ul>
-
-                                                    </li>
-
-
-                                                    {{-- ========================= --}}
-                                                    {{-- CATEGORY BANNERS --}}
-                                                    {{-- ========================= --}}
-
-                                                    <li class="mega-menu-col col-lg-5">
-
-                                                        {{-- BANNER 1 --}}
-                                                        <div class="header-banner2">
-
-                                                            <img src="{{ asset('/') }}frontend/assets/images/menu_banner7.jpg"
-                                                                alt="menu_banner">
-
-                                                            <div class="banne_info">
-
-                                                                <h6>20% Off</h6>
-
-                                                                <h4>{{ $category->category_name }}</h4>
-
-                                                                <a href="{{ route('slug.handler', $category->category_slug) }}">
-                                                                    Shop now
+                                                            <div class="banne_info" style="max-width: 50%; width: 100%; display: flex; flex-direction: column; justify-content: center;">
+                                                                @if($banner1->discount_text)
+                                                                    <h6 style="font-size: 13px; margin-bottom: 4px; display: block; word-wrap: break-word;">{{ $banner1->discount_text }}</h6>
+                                                                @endif
+                                                                
+                                                                <h4 style="font-size: 16px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; display: block; word-wrap: break-word; white-space: normal;">
+                                                                    {{ $banner1->title ?? ($category->category_name ?? $category->name) }}
+                                                                </h4>
+                                                                
+                                                                <a href="{{ $categoryRoute }}" style="font-size: 12px; font-weight: bold; text-decoration: underline; display: inline-block;">
+                                                                    Shop Now
                                                                 </a>
-
                                                             </div>
-
                                                         </div>
-
-
-                                                        {{-- BANNER 2 --}}
-                                                        <div class="header-banner2">
-
-                                                            <img src="{{ asset('/') }}frontend/assets/images/menu_banner8.jpg"
-                                                                alt="menu_banner">
-
-                                                            <div class="banne_info">
-
-                                                                <h6>15% Off</h6>
-
-                                                                <h4>{{ $category->category_name }}</h4>
-
-                                                                <a href="{{ route('slug.handler', $category->category_slug) }}">
-                                                                    Shop now
+                                                    @else
+                                                        {{-- DEFAULT BANNER 1 --}}
+                                                        <div class="header-banner2 mb-3">
+                                                            <a href="{{ $categoryRoute }}">
+                                                                <img src="{{ asset('/') }}frontend/assets/images/menu_banner7.jpg" alt="menu_banner">
+                                                            </a>
+                                                            <div class="banne_info" style="max-width: 50%; width: 100%; display: flex; flex-direction: column; justify-content: center;">
+                                                                <h6 style="font-size: 13px; margin-bottom: 4px; display: block;">20% Off</h6>
+                                                                <h4 style="font-size: 16px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; display: block; white-space: normal;">
+                                                                    {{ $category->category_name ?? $category->name }}
+                                                                </h4>
+                                                                <a href="{{ $categoryRoute }}" style="font-size: 12px; font-weight: bold; text-decoration: underline; display: inline-block;">
+                                                                    Shop Now
                                                                 </a>
-
                                                             </div>
-
                                                         </div>
+                                                    @endif
 
-                                                    </li>
+                                                    {{-- BANNER 2 --}}
+                                                    @if($banner2)
+                                                        <div class="header-banner2">
+                                                            <a href="{{ $categoryRoute }}">
+                                                                <img src="{{ asset($banner2->image) }}" alt="{{ $banner2->title }}">
+                                                            </a>
 
-                                                </ul>
+                                                            <div class="banne_info" style="max-width: 50%; width: 100%; display: flex; flex-direction: column; justify-content: center;">
+                                                                @if($banner2->discount_text)
+                                                                    <h6 style="font-size: 13px; margin-bottom: 4px; display: block; word-wrap: break-word;">{{ $banner2->discount_text }}</h6>
+                                                                @endif
 
-                                            </div>
+                                                                <h4 style="font-size: 16px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; display: block; word-wrap: break-word; white-space: normal;">
+                                                                    {{ $banner2->title ?? ($category->category_name ?? $category->name) }}
+                                                                </h4>
 
-                                        @endif
+                                                                <a href="{{ $categoryRoute }}" style="font-size: 12px; font-weight: bold; text-decoration: underline; display: inline-block;">
+                                                                    Shop Now
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        {{-- DEFAULT BANNER 2 --}}
+                                                        <div class="header-banner2">
+                                                            <a href="{{ $categoryRoute }}">
+                                                                <img src="{{ asset('/') }}frontend/assets/images/menu_banner8.jpg" alt="menu_banner">
+                                                            </a>
+                                                            <div class="banne_info" style="max-width: 50%; width: 100%; display: flex; flex-direction: column; justify-content: center;">
+                                                                <h6 style="font-size: 13px; margin-bottom: 4px; display: block;">15% Off</h6>
+                                                                <h4 style="font-size: 16px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; display: block; white-space: normal;">
+                                                                    {{ $category->category_name ?? $category->name }}
+                                                                </h4>
+                                                                <a href="{{ $categoryRoute }}" style="font-size: 12px; font-weight: bold; text-decoration: underline; display: inline-block;">
+                                                                    Shop Now
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    @endif
 
-                                    </li>
+                                                </li>
 
-                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
 
-
+                                </li>
+                            @endforeach
                                 {{-- ================================================= --}}
                                 {{-- MORE CATEGORIES --}}
                                 {{-- 7TH CATEGORY ONWARDS --}}

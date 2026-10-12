@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductColor;
 use Flasher\Toastr\Prime\ToastrInterface;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 class CartController extends Controller
 {
     protected $toastr;
+
     public function __construct(ToastrInterface $toastr)
     {
         $this->toastr = $toastr;
@@ -19,17 +21,16 @@ class CartController extends Controller
 
     public function index()
     {
-
-        // Cart item এর সাথে DB product attach করে দিচ্ছি
         $products = Cart::content()->map(function ($item) {
-            $item->db_product = Product::find($item->id);
+            $productId = explode('-', $item->id)[0];
+            $item->db_product = Product::with('colors')->find($productId);
             return $item;
         });
 
-            $cartSubtotal = (float)Cart::subtotal(2, '.', '');
-            $cartTax = $cartSubtotal * 0.005; // ১০% ট্যাক্স
-            $shipping = 0; // নির্দিষ্ট শিপিং চার্জ
-            $cartTotal = $cartSubtotal + $cartTax + $shipping;
+        $cartSubtotal = (float)Cart::subtotal(2, '.', '');
+        $cartTax = $cartSubtotal * 0.005; 
+        $shipping = 0;
+        $cartTotal = $cartSubtotal + $cartTax + $shipping;
 
         return view('frontend.cart.view_cart', [
             'products' => $products,
@@ -42,18 +43,34 @@ class CartController extends Controller
 
     public function addToCartQV(Request $request)
     {
-        $product = Product::find($request->id);
+        $product = Product::with('colors')->find($request->id);
+
+        if (!$product) {
+            return response()->json(['status' => 'error', 'message' => 'Product not found!'], 404);
+        }
+
+        $colorImage = null;
+
+        if ($request->color) {
+            $selectedColor = ProductColor::where('product_id', $product->id)
+                                         ->where('color', $request->color) 
+                                         ->first();
+            $colorImage = $selectedColor?->thumbnail; 
+        }
+        if (!$colorImage && $product->colors->isNotEmpty()) {
+            $colorImage = $product->colors->first()?->thumbnail;
+        }
 
         Cart::add([
-            'id' => $product->id . '-' . $request->size . '-' . $request->color,
+            'id' => $product->id . '-' . ($request->size ?? 'default') . '-' . ($request->color ?? 'default'),
             'name' => $product->product_name,
-            'qty' => $request->qty,
-            'price' => $request->price,
+            'qty' => $request->qty ?? 1,
+            'price' => $request->price ?? $product->selling_price,
             'weight' => '1',
             'options' => [
                 'size' => $request->size,
                 'color' => $request->color,
-                'thumbnail' => $product->thumbnail,
+                'thumbnail' => $colorImage,
             ],
         ])->associate(Product::class);
 
@@ -90,6 +107,7 @@ class CartController extends Controller
         Cart::remove($rowId);
         return response()->json(['success' => true, 'message' => 'Product removed from cart successfully.']);
     }
+
     public function update(Request $request)
     {
         $rowId = $request->rowId;
@@ -98,13 +116,9 @@ class CartController extends Controller
         Cart::update($rowId, $qty);
 
         $productSubtotal = Cart::get($rowId)->subtotal(2, '.', '');
-
         $cartSubtotal = (float)Cart::subtotal(2, '.', '');
-
-        $cartTax = $cartSubtotal * 0.005; // ১০% ট্যাক্স
-
-        $shipping = 0; // নির্দিষ্ট শিপিং চার্জ
-
+        $cartTax = $cartSubtotal * 0.005;
+        $shipping = 0;
         $cartTotal = $cartSubtotal + $cartTax + $shipping;
 
         return response()->json([
@@ -117,5 +131,4 @@ class CartController extends Controller
             'updatedSubtotal' => number_format($productSubtotal, 2, '.', ''),
         ]);
     }
-
 }

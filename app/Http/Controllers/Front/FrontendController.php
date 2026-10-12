@@ -23,61 +23,68 @@ class FrontendController extends Controller
 {
     public function index() {
         $sliders = Slider::all();
-        $top_viewed_categories = Category::orderBy('view_count', 'DESC')
-                                ->limit(6)
-                                ->get();
+        $top_viewed_categories = Category::orderBy('view_count', 'DESC')->limit(6)->get();
+        
         foreach ($top_viewed_categories as $category) {
             $category->increment('view_count');
         }
+
         $brands = Brand::inRandomOrder()->where('front_page', 1)->limit(12)->get();
         $bannerproduct = Product::where('status', 1)->where('product_slider', 1)->latest()->first();
 
-        // Fetch and sort featured products by rating
+        // Featured Products
         $featured = Product::where('status', 1)->where('featured', 1)->with('colors')->orderBy('id', 'DESC')->limit(16)->get();
-        $this->calculateAndSortRatings($featured);
+        $featured = $this->calculateAndSortRatings($featured); // Assign Return Value
 
         $today_deal = Product::with(['colors','subcategory'])
             ->where('status', 1)
             ->where('today_deal', 1)
-            ->with('colors')
             ->orderBy('id', 'DESC')
             ->first();
 
         if ($today_deal) {
             $today_deal->countdown_time = Carbon::parse($today_deal->updated_at)->addDays(4)->format('Y/m/d H:i:s');
         }
-        // Fetch and sort popular products by rating
-        $popular_product = Product::where('status', 1)->with('colors')->orderBy('product_views', 'DESC')->limit(16)->get();
-        $this->calculateAndSortRatings($popular_product);
 
-        // Fetch and sort trendy products by rating
-        $trendy_product = Product::where('status', 1)->with('colors')->where('trendy_product', 1)->orderBy('id', 'DESC')->limit(16)->get();
-        $this->calculateAndSortRatings($trendy_product);
-        $trendy_product_new=Product::where('status', 1)->where('trendy_product', 1)->with('colors')->orderBy('id', 'DESC')->with('childcategory')->first();
-        // Fetch and sort top-rated products
+        // Popular Products
+        $popular_product = Product::where('status', 1)->with('colors')->orderBy('product_views', 'DESC')->limit(16)->get();
+        $popular_product = $this->calculateAndSortRatings($popular_product); // Assign Return Value
+
+        // Trendy Products
+        $trendy_product = Product::where('status', 1)->where('trendy_product', 1)->with('colors')->orderBy('id', 'DESC')->limit(16)->get();
+        $trendy_product = $this->calculateAndSortRatings($trendy_product); // Assign Return Value
+
+        $trendy_product_new = Product::where('status', 1)->where('trendy_product', 1)->with(['colors', 'category'])->orderBy('id', 'DESC')->first();
+
+        // Top Rated Products
         $top_rated_products = Product::select('products.*')
             ->with('colors')
             ->leftJoin(DB::raw('(SELECT product_id, MAX(rating) as highest_rating FROM reviews GROUP BY product_id) as reviews'), 'products.id', '=', 'reviews.product_id')
             ->orderBy('reviews.highest_rating', 'DESC')
             ->limit(10)
             ->get();
-        $this->calculateAndSortRatings($top_rated_products);
+        $top_rated_products = $this->calculateAndSortRatings($top_rated_products); // Assign Return Value
 
-        // Home Page Category
-        $home_category = Category::where('home_page',1)->orderBy('category_name', 'DESC')->get();
-         $settings=Setting::all();
-        return view('frontend.pages.index', compact('sliders','settings','top_viewed_categories','trendy_product_new', 'brands', 'top_rated_products', 'bannerproduct', 'featured', 'popular_product', 'trendy_product','today_deal', 'home_category'));
+        $home_category = Category::where('home_page', 1)->with(['subcategories.childCategories', 'ads'])->orderBy('category_name', 'DESC')->get();
+        $settings = Setting::all();
+
+        return view('frontend.pages.index', compact(
+            'sliders', 'settings', 'top_viewed_categories', 'trendy_product_new', 
+            'brands', 'top_rated_products', 'bannerproduct', 'featured', 
+            'popular_product', 'trendy_product', 'today_deal', 'home_category'
+        ));
     }
 
+    // Updated Helper Function
     private function calculateAndSortRatings($products) {
         foreach ($products as $product) {
             $product->reviewCount = Review::where('product_id', $product->id)->count();
-            $product->averageRating = Review::where('product_id', $product->id)->avg('rating');
-            $product->highestRating = Review::where('product_id', $product->id)->max('rating');
+            $product->averageRating = Review::where('product_id', $product->id)->avg('rating') ?? 0;
+            $product->highestRating = Review::where('product_id', $product->id)->max('rating') ?? 0;
         }
 
-        // Sort products by average rating in descending order
-        $products = $products->sortByDesc('averageRating');
+        // Return the sorted collection
+        return $products->sortByDesc('averageRating');
     }
 
     //Single Page
@@ -429,5 +436,69 @@ class FrontendController extends Controller
     {
         $contacts = ContactMessage::all();
         return view('frontend.pages.contact', compact('contacts'));
+    }
+
+    public function trendingProducts()
+    {
+        $brands = Brand::where('front_page', 1)->get();
+
+        $sizes = Product::whereNotNull('size')->pluck('size')->flatMap(function($item){
+            return explode(',', $item);
+        })->unique()->values();
+
+        $colors = Product::whereNotNull('color')->pluck('color')->flatMap(function($item){
+            return explode(',', $item);
+        })->unique()->values();
+
+        $sort = request('sort');
+        $perPage = request('perPage') ?? 12;
+        $minPrice = request('min_price');
+        $maxPrice = request('max_price');
+
+        $query = Product::where('status', 1)
+            ->where('trendy_product', 1)
+            ->with('colors');
+
+        if ($minPrice !== null && $maxPrice !== null) {
+            $query->where(function($q) use ($minPrice, $maxPrice) {
+
+                $q->whereBetween('discount_price', [$minPrice, $maxPrice])
+
+                ->orWhere(function($subQ) use ($minPrice, $maxPrice) {
+                    $subQ->whereNull('discount_price')
+                        ->whereBetween('selling_price', [$minPrice, $maxPrice]);
+                });
+            });
+        }
+
+        if ($sort === 'popularity') {
+            $query->orderBy('product_views', 'DESC');
+        } elseif ($sort === 'newness') {
+            $query->orderBy('created_at', 'DESC');
+        } elseif ($sort === 'low_to_high') {
+            $query->orderBy('selling_price', 'ASC');
+        } elseif ($sort === 'high_to_low') {
+            $query->orderBy('selling_price', 'DESC');
+        } else {
+            $query->orderBy('id', 'DESC');
+        }
+
+        $products = $query->paginate($perPage)->appends(request()->query());
+        $this->calculateAndSortRatings($products);
+
+        $title = 'Trending Products';
+        $breadcrumb = [
+            ['name' => 'Home', 'url' => route('index')],
+            ['name' => 'Trending Products', 'url' => ''],
+        ];
+
+        return view('frontend.pages.category', [
+            'brands' => $brands,
+            'sizes' => $sizes,
+            'colors' => $colors,
+            'products' => $products,
+            'breadcrumb' => $breadcrumb,
+            'title' => $title,
+        ]);
     }
 }

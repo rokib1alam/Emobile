@@ -108,6 +108,11 @@
                         <small id="emailHelp" class="form-text text-muted">This is your main category</small>
                     </div>
                     <div class="form-group">
+                      <label for="brand_logo" class="col-form-label pt-0">Category image <sup class="text-size-20 top-1">*</sup></label>
+                      <input type="file" class="dropify" data-height="200" name="category_image" />
+                      <small id="emailHelp" class="form-text text-muted">This is your Category image</small>
+                    </div>
+                    <div class="form-group">
                         <label for="icon" class="col-form-label pt-0">Icon <sup class="text-size-20 top-1">*</sup></label>
                         <input type="text" class="form-control" id="icon" name="icon" required>
                     </div>

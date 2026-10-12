@@ -90,7 +90,7 @@ Route::group([], function () {
 
     // Static pages
     Route::get('/new', [FrontendController::class, 'new'])->name('new');
-
+ Route::get('/trending-products', [FrontendController::class, 'trendingProducts'])->name('trending.products');
     // Catch-all slug route (must be last)
     Route::get('{slug}', [FrontendController::class, 'slugHandler'])->name('slug.handler');
 });
