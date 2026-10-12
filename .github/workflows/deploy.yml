@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Sync Files via SSH
-        uses: easingthemes/ssh-deploy@main
-        env:
+        uses: easingthemes/ssh-deploy@v5.1.0
+        with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: "-avz --delete"
           EXCLUDE: "/.git/, /.github/, /.env, /.htaccess, /vendor/, /node_modules/"
