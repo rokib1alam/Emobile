@@ -3,16 +3,46 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
    <!-- Meta -->
-   <meta charset="utf-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta content="Anil z" name="author">
-   <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="Shopwise is Powerful features and You Can Use The Perfect Build this Template For Any eCommerce Website. The template is built for sell Fashion Products, Shoes, Bags, Cosmetics, Clothes, Sunglasses, Furniture, Kids Products, Electronics, Stationery Products and Sporting Goods.">
-   <meta name="keywords" content="ecommerce, electronics store, Fashion store, furniture store,  bootstrap 4, clean, minimal, modern, online store, responsive, retail, shopping, ecommerce store">
-   <!-- CSRF Token -->
-   <meta name="csrf-token" content="{{ csrf_token() }}">
-   <!-- SITE TITLE -->
-   <title>{{ config('app.name', 'Laravel') }}</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="Anil z" name="author">
+    <meta name="author" content="{{ $seo->meta_author ?? '' }}">
+    <meta name="keywords" content="{{ $seo->meta_keyword ?? '' }}">
+    <meta name="description" content="@yield('meta_description', $seo->meta_description ?? '')">
+    <meta name="tags" content="{{ $seo->meta_tag ?? '' }}">
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- SITE TITLE -->
+    <title>{{ $seo->meta_title ?? config('app.name') }}</title>
+
+
+    <!-- Google Site Verification -->
+    @if(!empty($seo->google_verification))
+        <meta name="google-site-verification" content="{{ $seo->google_verification }}" />
+    @endif
+
+    <!-- Alexa Site Verification -->
+    @if(!empty($seo->alexa_verification))
+        <meta name="alexaVerifyID" content="{{ $seo->alexa_verification }}" />
+    @endif
+
+    <!-- Google AdSense Code -->
+    @if(!empty($seo->google_adsense))
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $seo->google_adsense }}" crossorigin="anonymous"></script>
+    @endif
+
+    <!-- Google Analytics (GA4) Code -->
+    @if(!empty($seo->google_analytics))
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $seo->google_analytics }}"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', '{{ $seo->google_analytics }}');
+        </script>
+    @endif
+
    <!-- CSS File Start -->
    @include('frontend.layouts.style')
    <!-- CSS File End -->

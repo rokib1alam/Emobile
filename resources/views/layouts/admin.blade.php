@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>@yield('title')</title>
+    <title>{{ $seo->meta_title ?? config('app.name') }}</title>
     <!-- [Meta] -->
     @include('admin.layouts.meta')
     <!-- [style] -->

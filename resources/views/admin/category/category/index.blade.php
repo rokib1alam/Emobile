@@ -158,6 +158,7 @@
           let id = $(this).data('id');
           $.get("category/" + id + "/edit", function(data) {
               $('#editModalBody').html(data);
+              $('.dropify').dropify();
           });
       });
   </script>

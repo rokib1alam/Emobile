@@ -1,5 +1,5 @@
 <!-- Favicon Icon -->
-<link href="img/favicon.ico" rel="icon">
+<link rel="icon" href="{{ asset($setting->favicon) }}">
 <!-- Animation CSS -->
 <link rel="stylesheet" href="{{asset('/')}}frontend/assets/css/animate.css">
 <!-- Latest Bootstrap min CSS -->

@@ -8,6 +8,7 @@ use App\Http\Controllers\Front\FrontendController;
 use App\Http\Controllers\Front\CheckoutController;
 use App\Http\Controllers\Front\ReviewController;
 use App\Http\Controllers\Front\CompareController;
+use App\Http\Controllers\Admin\AdminHomeController;
 
 // User Controller
 use App\Http\Controllers\User\SellController;
@@ -54,15 +55,11 @@ Route::group([], function () {
     Route::delete('/cart/remove/{rowId}', [CartController::class, 'destroy'])->name('cart.remove');
 
     // Checkout Routes (User must be logged in)
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout');
-        Route::post('/checkout', [CheckoutController::class, 'placeOrder'])->name('checkout.submit');
-
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout');
+    Route::post('/checkout', [CheckoutController::class, 'placeOrder'])->name('checkout.submit');
         // Invoice page after payment success
-
-        Route::get('/order/invoice/{id}', [CheckoutController::class, 'invoice'])->name('order.invoice');
-        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    });
+    Route::get('/order/invoice/{transaction_id}', [CheckoutController::class, 'invoice'])->name('order.invoice');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
     // SSLCommerz Callback Routes (No auth middleware)
     Route::controller(SslcommerzController::class)
@@ -87,6 +84,7 @@ Route::group([], function () {
     Route::post('/wishlist/remove', [ReviewController::class, 'remove'])->name('wishlist.remove');
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/add/wishlist/{id}', [ReviewController::class, 'addWishlist'])->name('wishlist.add');
+    Route::post('/steadfast/webhook', [AdminHomeController::class, 'handleSteadfastWebhook']);
 
     // Static pages
     Route::get('/new', [FrontendController::class, 'new'])->name('new');

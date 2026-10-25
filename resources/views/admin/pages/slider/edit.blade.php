@@ -1,44 +1,35 @@
-<form action="{{ route('slider.update', $slider->id) }}" method="post" id="edit-form" enctype="multipart/form-data">
+<form action="{{ route('slider.update', $slider->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
-    <div class="modal-body">
-        <div class="form-group">
-            <label for="heading_text" class="col-form-label pt-0">Heading Text<sup class="text-size-20 top-1">*</sup></label>
-            <input type="text" class="form-control" id="heading_text" name="heading_text" value="{{ $slider->heading_text }}" required>
-            <small id="headingHelp" class="form-text text-muted">This is your Slider Heading Text</small>
-        </div>
+    
+    <div class="form-group mb-3">
+        <label for="heading_text" class="col-form-label pt-0">Heading Text<sup class="text-size-20 top-1">*</sup></label>
+        <input type="text" class="form-control" name="heading_text" value="{{ $slider->heading_text }}" required>
+    </div>
+    
+    <div class="form-group mb-3">
+        <label for="caption_text" class="col-form-label pt-0">Caption Text<sup class="text-size-20 top-1">*</sup></label>
+        <input type="text" class="form-control" name="caption_text" value="{{ $slider->caption_text }}" required>
+    </div>
 
-        <div class="form-group">
-            <label for="caption_text" class="col-form-label pt-0">Caption Text<sup class="text-size-20 top-1">*</sup></label>
-            <input type="text" class="form-control" id="caption_text" name="caption_text" value="{{ $slider->caption_text }}" required>
-            <small id="captionHelp" class="form-text text-muted">This is your Slider Caption Text</small>
-        </div>
-
-        <div class="form-group">
-            <label for="current_video" class="col-form-label pt-0">Current Video</label>
+    <!-- Current Media Previews -->
+    <div class="form-group">
+            <label for="brand_logo" class="col-form-label pt-0">Current Imge</label>
             <br>
-            @if($slider->video_url)
-                <video controls width="200">
-                    <source src="{{ asset($slider->video_url) }}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
+            @if($slider->image_url)
+            <img src="{{ asset($slider->image_url) }}" alt="Brand Logo" class="img-fluid" style="max-width: 100px;">
             @else
-                <p>No video uploaded.</p>
+            <p>No Image uploaded.</p>
             @endif
+    </div>
+        <div class="form-group">
+            <label for="image_url" class="col-form-label pt-0">Image</label>
+            <input type="file" class="dropify" data-height="200" name="image_url">
+            <small id="emailHelp" class="form-text text-muted">Upload a Image file (jpeg, png, jpg, gif, svg)</small>
         </div>
 
-        <div class="col-md-12">
-            <label for="video_url" class="col-form-label pt-0">Upload New Video (Optional)</label>
-            <input type="file" class="form-control" name="video_url" accept="video/*">
-            <small id="videoHelp" class="form-text text-muted">You can upload a new video for the slider (Optional)</small>
-        </div>
-
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Update Slider</button>
-        </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Update Changes</button>
     </div>
 </form>
-
-{{-- For file upload script --}}
-<script src="{{ asset('/') }}admin/assets/fileuploads/js/fileupload.js"></script>
-<script src="{{ asset('/') }}admin/assets/fileuploads/js/file-upload.js"></script>

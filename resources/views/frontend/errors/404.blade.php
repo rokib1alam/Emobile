@@ -5,7 +5,7 @@
 @section('content')
 
     <!--Full width header Start-->
-        @include('frontend.layouts.others_header')
+        @include('frontend.layouts.nheader')
     <!--Full width header End-->
 
 	<!-- Breadcrumbs Start -->

@@ -34,6 +34,9 @@ use App\Http\Controllers\Admin\NotificationController;
 // Accessible by all authenticated admins (superadmin, admin, mistri)
 Route::prefix('admin')->middleware(['auth:admin', 'role:super-admin|admin|editor'])->group(function () {
     Route::get('/dashboard', [AdminHomeController::class, 'index'])->name('admin.dashboard');
+
+    Route::post('/orders/{id}/send-steadfast', [AdminHomeController::class, 'sendToSteadfast'])->name('admin.orders.send-steadfast');
+
     Route::get('/profile', [AdminHomeController::class, 'show'])->name('admin.profile');
     Route::get('/profile/edit', [AdminHomeController::class, 'edit'])->name('admin.profile.edit');
     Route::put('/profile/update', [AdminHomeController::class, 'update'])->name('admin.profile.update');

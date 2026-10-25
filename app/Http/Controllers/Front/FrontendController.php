@@ -123,30 +123,66 @@ class FrontendController extends Controller
 
     }
 //Product Quick View
+    // public function productQuickView($id)
+    // {
+    //     $product=Product::where('id',$id)->first();
+    //     if ($product) {
+    //         $product->images = json_decode($product->images);
+
+    //         $tags = !empty($product->tags) ? explode(',', $product->tags) : [];
+    //         $color = !empty($product->color) ? explode(',', $product->color) : [];
+    //         $size = !empty($product->size) ? explode(',', $product->size) : [];
+    //     }
+    //     else {
+    //         $tags = [];
+    //         $color = [];
+    //         $size = [];
+    //     }
+    //     // Fetch reviews for the current product
+    //     $reviews= review::where('product_id', $product->id)->get();
+    //     // Calculate review count and average rating
+    //     $reviewCount = $reviews->count();
+    //     $averageRating = $reviews->avg('rating');
+    //     return view('frontend.product.quick_view', compact('product','tags','color','size','reviews','averageRating','reviewCount'));
+    // }
+
+// Product Quick View
     public function productQuickView($id)
     {
-        $product=Product::where('id',$id)->first();
-        if ($product) {
-            $product->images = json_decode($product->images);
+        // colors, brand, category, pickuppoint রিলেশনশিপসহ প্রোডাক্ট লোড করা
+        $product = Product::with(['colors', 'brand', 'category', 'pickuppoint'])->find($id);
 
-            $tags = !empty($product->tags) ? explode(',', $product->tags) : [];
-            $color = !empty($product->color) ? explode(',', $product->color) : [];
-            $size = !empty($product->size) ? explode(',', $product->size) : [];
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
         }
-        else {
-            $tags = [];
-            $color = [];
-            $size = [];
+
+        // JSON Format images চেক এবং ডিকোড করা
+        if (!empty($product->images)) {
+            $product->images = is_string($product->images) ? json_decode($product->images, true) : $product->images;
+        } else {
+            $product->images = [];
         }
+
+        // Tags এবং Size প্রসেসিং
+        $tags = !empty($product->tags) ? array_map('trim', explode(',', $product->tags)) : [];
+        $size = !empty($product->size) ? array_map('trim', explode(',', $product->size)) : [];
+
         // Fetch reviews for the current product
-        $reviews= review::where('product_id', $product->id)->get();
+        $reviews = Review::where('product_id', $product->id)->get();
+        
         // Calculate review count and average rating
         $reviewCount = $reviews->count();
-        $averageRating = $reviews->avg('rating');
-        return view('frontend.product.quick_view', compact('product','tags','color','size','reviews','averageRating','reviewCount'));
+        $averageRating = $reviews->avg('rating') ?? 0;
+
+        return view('frontend.product.quick_view', compact(
+            'product',
+            'tags',
+            'size',
+            'reviews',
+            'averageRating',
+            'reviewCount'
+        ));
     }
-
-
 
     public function slugHandler($slug)
     {

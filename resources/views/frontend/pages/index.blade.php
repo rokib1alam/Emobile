@@ -114,8 +114,6 @@
                                                 $sellingPrice = (float) $featur->selling_price;
                                                 $discountPrice = $featur->discount_price ? (float) $featur->discount_price : null;
                                                 $finalPrice = $discountPrice ? $discountPrice : $sellingPrice;
-
-                                                // Optional Chaining (?->) ব্যবহার করায় null হলেও ক্র্যাশ করবে না
                                                 $defaultColor = $featur->colors?->first()?->color_name ?? '';
                                                 $defaultSize  = $featur->sizes?->first()?->size_name ?? '';
                                             @endphp
@@ -124,50 +122,45 @@
                                                     <span class="pr_flash bg-danger">Hot</span>
                                                     <div class="product_img">
                                                         <a href="{{ route('product.details', $featur->product_slug) }}">
-
                                                             @php
                                                                 $featuredColor = $featur->colors->first();
                                                             @endphp
-
                                                             @if($featuredColor && $featuredColor->thumbnail)
-
                                                                 <img
                                                                     src="{{ asset($featuredColor->thumbnail) }}"
                                                                     alt="{{ $featur->product_name }}"
                                                                 >
-
                                                                 <img
                                                                     class="product_hover_img"
                                                                     src="{{ asset($featuredColor->thumbnail) }}"
                                                                     alt="{{ $featur->product_name }} Hover Image"
                                                                 >
-
                                                             @else
-
                                                                 <img
                                                                     src="{{ asset('frontend/assets/images/no-image.png') }}"
                                                                     alt="{{ $featur->product_name }}"
                                                                 >
-
                                                                 <img
                                                                     class="product_hover_img"
                                                                     src="{{ asset('frontend/assets/images/no-image.png') }}"
                                                                     alt="{{ $featur->product_name }} Hover Image"
                                                                 >
-
                                                             @endif
-
                                                         </a>
                                                         <div class="product_action_box">
                                                             <ul class="list_none pr_action_btn">
-                                                                <li class="add-to-cart">
-                                                                    <a href="javascript:void(0);" class="add-to-cart" data-id="{{ $featur->id }}" data-price="{{ $finalPrice }}" data-color="{{ $defaultColor }}" data-size="{{ $defaultSize }}" data-qty="1">
-                                                                        <i class="icon-basket-loaded"></i> Add To Cart
+                                                                <!-- Buy Now Action -->
+                                                                <li>
+                                                                    <a href="{{ route('checkout', ['product_id' => $featur->id]) }}" class="buy-now-btn" title="Buy Now">
+                                                                        <i class="icon-bag"></i> Buy Now
                                                                     </a>
                                                                 </li>
-                                                                <li><a href="javascript:void(0)" onclick="addToCompare({{ $featur->id }})" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                                                <li><a href="javascript:void(0)" id="{{$featur->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
-                                                                <li><a href="{{ route('wishlist.add', $featur->id) }}"><i class="icon-heart"></i></a></li>
+                                                                <!-- Quick View Action -->
+                                                                <li>
+                                                                    <a href="javascript:void(0)" id="{{$featur->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal" title="Quick View">
+                                                                        <i class="icon-magnifier-add"></i>
+                                                                    </a>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -210,7 +203,6 @@
                                                 $sellingPrice = (float) $product->selling_price;
                                                 $discountPrice = $product->discount_price ? (float) $product->discount_price : null;
                                                 $finalPrice = $discountPrice ? $discountPrice : $sellingPrice;
-
                                                 $defaultColor = $product->colors?->first()?->color_name ?? '';
                                                 $defaultSize  = $product->sizes?->first()?->size_name ?? '';
                                                 $popularColor = $product->colors?->first();
@@ -229,14 +221,19 @@
                                                         </a>
                                                         <div class="product_action_box">
                                                             <ul class="list_none pr_action_btn">
-                                                                <li class="add-to-cart">
-                                                                    <a href="javascript:void(0);" class="add-to-cart" data-id="{{ $product->id }}" data-price="{{ $finalPrice }}" data-color="{{ $defaultColor }}" data-size="{{ $defaultSize }}" data-qty="1">
-                                                                        <i class="icon-basket-loaded"></i> Add To Cart
+                                                                <!-- Buy Now Action -->
+                                                                
+                                                                <li>
+                                                                    <a href="{{ route('checkout', ['product_id' => $product->id]) }}" class="buy-now-btn" title="Buy Now">
+                                                                        <i class="icon-bag"></i> Buy Now
                                                                     </a>
                                                                 </li>
-                                                                <li><a href="javascript:void(0)" onclick="addToCompare({{ $product->id }})" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                                                <li><a href="javascript:void(0)" id="{{$product->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
-                                                                <li><a href="{{ route('wishlist.add', $product->id) }}"><i class="icon-heart"></i></a></li>
+                                                                <!-- Quick View Action -->
+                                                                <li>
+                                                                    <a href="javascript:void(0)" id="{{$product->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal" title="Quick View">
+                                                                        <i class="icon-magnifier-add"></i>
+                                                                    </a>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -269,12 +266,11 @@
                                         @endforeach
                                     </div>
                                 </div>
-                
+
                             </div>
                         </div>
                     </div>
                 </div>
-                file
             </div>
 
         </div>

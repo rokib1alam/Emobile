@@ -2,7 +2,7 @@
 @section('title','Shopwise|Login')
 @section('content')
 <!-- START HEADER -->
-@include('frontend.layouts.others_header')
+@include('frontend.layouts.nheader')
 <!-- END HEADER -->
 <!-- START LOGIN SECTION -->
 <div class="login_register_wrap section">

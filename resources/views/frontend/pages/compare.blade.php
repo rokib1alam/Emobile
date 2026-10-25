@@ -1,14 +1,14 @@
 @extends('layouts.app')
-@section('title','Shopwise|Product')
+@section('title','Product')
 @section('content')
 <!-- START HEADER -->
-@include('frontend.layouts.others_header')
+@include('frontend.layouts.nheader')
 <!-- END HEADER -->
 
 <!-- START SECTION BREADCRUMB -->
 <div class="breadcrumb_section bg_gray page-title-mini">
     <div class="container"><!-- STRART CONTAINER -->
-        <div class="row align-items-center">
+        <div class="row align-items-center">s
         	<div class="col-md-6">
                 <div class="page-title">
             		<h1>Compare</h1>

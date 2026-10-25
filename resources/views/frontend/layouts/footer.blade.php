@@ -2,7 +2,7 @@
 	<div class="footer_top small_pt pb_20">
         <div class="custom-container">
             <div class="row">
-                @foreach($settings as $setting)
+               
                 <div class="col-lg-4 col-md-12 col-sm-12">
                 	<div class="widget">
                         <div class="footer_logo">
@@ -29,100 +29,96 @@
                         </ul>
                     </div>
         		</div>
-                @endforeach
+                
                 <div class="col-lg-2 col-md-4 col-sm-6">
                 	<div class="widget">
                         <h6 class="widget_title">Useful Links</h6>
                         <ul class="widget_links">
+                            @foreach($categories as $category)
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('slug.handler', $category->category_slug) }}">
+                                        {{ $category->category_name }}
+                                    </a>
+                                </li>
+                            @endforeach
                             <li><a href="{{ route('about') }}">About Us</a></li>
                             <li><a href="{{ route('contact') }}">Contact</a></li>
                         </ul>
                     </div>
                 </div>
 
-                    <div class="col-lg-4 col-md-4 col-sm-12">
-                	<div class="widget">
-                        <h6 class="widget_title">Facebook Image</h6>
-                        <ul class="widget_instafeed instafeed_col4">
-                             @foreach ($featured as $featur)
-                            <li><a href="{{ route('product.details', $featur->product_slug) }}"><img src="{{asset($featur->thumbnail)}}" alt="insta_img"></a></li>
-                           @endforeach
-                        </ul>
-                    </div>
-                </div>
-                
                 <div class="col-lg-4 col-md-4 col-sm-12">
                 	<div class="widget">
                         <h6 class="widget_title">Product Image</h6>
                         <ul class="widget_instafeed instafeed_col4">
-                             @foreach ($featured as $featur)
-                            <li><a href="{{ route('product.details', $featur->product_slug) }}"><img src="{{asset($featur->thumbnail)}}" alt="insta_img"></a></li>
-                           @endforeach
+                            @if(isset($featured) && $featured->count() > 0)
+                                @foreach ($featured as $featur)
+                                    @php
+                                        $relatedColor = optional($featur->colors)->first(); 
+                                    @endphp
+
+                                    <li>
+                                        <a href="{{ route('product.details', $featur->product_slug) }}">
+                                            @if($relatedColor && $relatedColor->thumbnail)
+                                                <img src="{{ asset($relatedColor->thumbnail) }}" alt="insta_img" style="mix-blend-mode: multiply;">
+                                            @else
+                                                <img src="{{ asset('frontend/assets/images/no-image.png') }}" alt="insta_img" style="mix-blend-mode: multiply;">
+                                            @endif
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @endif
                         </ul>
                     </div>
+                    
                 </div>
+                
             </div>
         </div>
     </div>
+
     <div class="middle_footer">
-    	<div class="custom-container">
-        	<div class="row">
-            	<div class="col-12">
-                	<div class="shopping_info">
+        <div class="custom-container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="shopping_info">
                         <div class="row justify-content-center">
-                            <div class="col-md-4">
-                                <div class="icon_box icon_box_style2">
-                                    <div class="icon">
-                                        <i class="flaticon-shipped"></i>
+                            @if(isset($faqs) && $faqs->count() > 0)
+                                @foreach($faqs as $faq)
+                                    <div class="col-md-4">
+                                        <div class="icon_box icon_box_style2">
+                                            <div class="icon">
+                                                <i class="{{ $faq->icon_class ?? 'flaticon-shipped' }}"></i>
+                                            </div>
+                                            <div class="icon_box_content">
+                                                <h5>{{ $faq->question }}</h5>
+                                                <p style="text-align: justify;">{{ $faq->answer }}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="icon_box_content">
-                                    	<h5>Free Delivery</h5>
-                                        <p>Phasellus blandit massa enim elit of passage varius nunc.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="icon_box icon_box_style2">
-                                    <div class="icon">
-                                        <i class="flaticon-money-back"></i>
-                                    </div>
-                                    <div class="icon_box_content">
-                                    	<h5>30 Day Returns Guarantee</h5>
-                                        <p>Phasellus blandit massa enim elit of passage varius nunc.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="icon_box icon_box_style2">
-                                    <div class="icon">
-                                        <i class="flaticon-support"></i>
-                                    </div>
-                                    <div class="icon_box_content">
-                                    	<h5>27/4 Online Support</h5>
-                                        <p>Phasellus blandit massa enim elit of passage varius nunc.</p>
-                                    </div>
-                                </div>
-                            </div>
+                                @endforeach
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="bottom_footer border-top-tran">
         <div class="custom-container">
             <div class="row">
                 <div class="col-lg-4">
-                    <p class="mb-lg-0 text-center">© {{ date('Y') }} All Rights Reserved by Bestwebcreator</p>
+                     <p class="mb-lg-0 text-center">&copy; {{ date('Y') }} <a href="{{ route('index') }}">{{ $seo->meta_author }} Limited</a>, All Right Reserved.</p>
                 </div>
                 <div class="col-lg-4 order-lg-first">
                     <div class="widget mb-lg-0">
                         <ul class="social_icons text-center text-lg-start">
-                            <li><a href="#" class="sc_facebook"><i class="ion-social-facebook"></i></a></li>
-                            <li><a href="#" class="sc_twitter"><i class="ion-social-twitter"></i></a></li>
-                            <li><a href="#" class="sc_google"><i class="ion-social-googleplus"></i></a></li>
-                            <li><a href="#" class="sc_youtube"><i class="ion-social-youtube-outline"></i></a></li>
-                            <li><a href="#" class="sc_instagram"><i class="ion-social-instagram-outline"></i></a></li>
+                            <li><a href="{{ $setting->facebook}}" class="sc_facebook"><i class="ion-social-facebook"></i></a></li>
+                            <li><a href="{{ $setting->twiteer}}" class="sc_twitter"><i class="ion-social-twitter"></i></a></li>
+                            <li><a href="{{ $setting->linkedin}}" class="sc_linkedin"><i class="ion-social-linkedin"></i></a></li>
+                            <li><a href="{{ $setting->youtube}}" class="sc_youtube"><i class="ion-social-youtube-outline"></i></a></li>
+                            <li><a href="{{ $setting->instragram}}" class="sc_instagram"><i class="ion-social-instagram-outline"></i></a></li>
                         </ul>
                     </div>
                 </div>

@@ -18,7 +18,9 @@ class Order extends Model
         'status',
         'payment_method',
         'payment_status',
-        'ipn_response'
+        'ipn_response',
+        'steadfast_consignment_id',
+        'steadfast_tracking_code'
     ];
 
     // Relation with User

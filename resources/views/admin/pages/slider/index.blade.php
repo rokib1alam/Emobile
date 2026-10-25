@@ -41,7 +41,7 @@
                                         <th>SL</th>
                                         <th>Heading Text</th>
                                         <th>Caption Text</th>
-                                        <th>Video</th>
+                                        <th>Image</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -53,7 +53,7 @@
                                         <th>SL</th>
                                         <th>Heading Text</th>
                                         <th>Caption Text</th>
-                                        <th>Video</th>
+                                        <th>Image</th>
                                         <th>Action</th>
                                     </tr>
                                 </tfoot>
@@ -91,9 +91,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="video_url" class="col-form-label pt-0">Video URL<sup class="text-size-20 top-1">*</sup></label>
-                        <input type="file" class="form-control" name="video_url" accept="video/*">
-                        <small id="videoHelp" class="form-text text-muted">Upload a video file (mp4, mov, ogg, qt)</small>
+                        <label for="image_url" class="col-form-label pt-0">Image <sup class="text-size-20 top-1">*</sup></label>
+                        <input type="file" class="dropify" data-height="200" name="image_url" />
+                        <small id="emailHelp" class="form-text text-muted">Upload a Image file (jpeg, png, jpg, gif, svg)</small>
                     </div>
 
                     <div class="modal-footer">
@@ -132,7 +132,7 @@
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'heading_text', name: 'heading_text' },
                 { data: 'caption_text', name: 'caption_text' },
-                { data: 'video_url', name: 'video_url' },
+                { data: 'image_url', name: 'image_url'},
                 { data: 'action', name: 'action', orderable: false, searchable: false }
             ]
         });
@@ -143,8 +143,10 @@
         let id = $(this).data('id');
         $.get("slider/" + id + "/edit", function(data) {
             $('.modal-body').html(data);
+            $('.dropify').dropify();
         });
     });
+    
 </script>
 
 @endsection

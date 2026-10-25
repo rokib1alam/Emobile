@@ -17,61 +17,37 @@
                          src="{{ url($setting->logo) }}"
                          alt="{{ config('app.name') }}">
                 </a>
-
-
                 {{-- SEARCH --}}
                 <div class="product_search_form radius_input search_form_btn">
                     <form onsubmit="return redirectSearchURL(event)">
-
                         <div class="input-group">
-
                             <div class="input-group-prepend">
-
                                 <div class="custom_select">
-
                                     <select class="first_null not_chosen"
                                             id="search_category"
                                             name="category">
-
                                         <option value="">
                                             All Category
                                         </option>
-
                                         @foreach($categories as $category)
-
                                             <option value="{{ route('slug.handler', $category->category_slug) }}">
-
                                                 {{ $category->category_name }}
-
                                             </option>
-
                                         @endforeach
-
                                     </select>
-
                                 </div>
-
                             </div>
-
-
                             <input class="form-control"
                                 id="search_input"
                                 name="search"
                                 placeholder="Search Product..."
                                 required
                                 type="text">
-
-
                             <button type="submit"
                                     class="search_btn3">
-
                                 Search
-
                             </button>
-
                         </div>
-
-
                         {{-- SEARCH RESULT --}}
                         <div id="search_result"
                             class="position-absolute bg-white w-100"
@@ -85,32 +61,23 @@
                     function redirectSearchURL(event)
                     {
                         event.preventDefault();
-
                         let search = document.getElementById('search_input').value.trim();
-
                         let category = document.getElementById('search_category').value;
 
-
                         if (search === '') {
-
                             return false;
-
                         }
-
 
                         /*
                         |--------------------------------------------------------------------------
                         | CATEGORY SELECTED
                         |--------------------------------------------------------------------------
                         */
-
                         if (category !== '') {
 
                             window.location.href =
                                 category + '?search=' + encodeURIComponent(search);
-
                             return false;
-
                         }
 
 
@@ -130,8 +97,8 @@
 
 
                 {{-- RIGHT ICONS --}}
-                <ul class="navbar-nav attr-nav align-items-center">
-                    {{-- USER --}}
+                {{-- <ul class="navbar-nav attr-nav align-items-center">
+                    
                     <li>
                         @if(Auth::check())
                             <a href="{{ route('dashboard') }}"
@@ -152,13 +119,13 @@
                             </a>
                         @endif
                     </li>
-                    {{-- WISHLIST --}}
+                   
                         @php
                             $wishlist= \App\Models\Wishlist::where('user_id', Auth::id())->count();
                         @endphp
                     <li><a href="{{ route('compare.page') }}"><i class="ti-control-shuffle"></i></a></li>
                     <li><a href="{{ route('wishlist') }}" class="nav-link"><i class="linearicons-heart"></i><span class="wishlist_count">{{ $wishlist }}</span></a></li>
-                    {{-- CART --}}
+                    
                     <li class="dropdown cart_dropdown">
                             <a class="nav-link cart_trigger" href="#" data-bs-toggle="dropdown">
                                 <i class="linearicons-bag2"></i>
@@ -193,7 +160,7 @@
                                 </div>
                             </div>
                     </li>
-                </ul>
+                </ul> --}}
 
             </div>
         </div>
@@ -649,7 +616,7 @@
                             <i class="linearicons-phone-wave"></i>
 
                             <span>
-                                {{ $setting->phone ?? '123-456-7689' }}
+                               {{ $setting->phone_one }}
                             </span>
 
                         </div>

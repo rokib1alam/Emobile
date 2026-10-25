@@ -142,6 +142,7 @@
         let id = $(this).data('id');
         $.get("brand/" + id + "/edit", function(data) {
             $('.modal-body').html(data);
+            $('.dropify').dropify();
         });
     });
 

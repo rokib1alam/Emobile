@@ -1,23 +1,28 @@
-<form action="{{ route('fact.update', $fact->id) }}" method="POST">
+<form action="{{ route('faq.update', $faq->id) }}" method="POST">
     @csrf
     @method('PUT')
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Edit FAQ</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
 
-    <div class="form-group">
-        <label for="icon_class">Icon Class</label>
-        <input type="text" class="form-control" name="icon_class" value="{{ $fact->icon_class }}" required>
-    </div>
+        <div class="modal-body">
+            <div class="form-group mb-3">
+                <label for="question">Question</label>
+                <input type="text" class="form-control" name="question" value="{{ $faq->question }}" required>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="answer">Answer</label>
+                <!-- সঠিক নিয়ম: textarea এর মাঝখানে ডেটা দিতে হবে -->
+                <textarea class="form-control" name="answer" rows="5" required>{{ $faq->answer }}</textarea>
+            </div>
+        </div>
 
-    <div class="form-group">
-        <label for="count_number">Count Number</label>
-        <input type="text" class="form-control" name="count_number" value="{{ $fact->count_number }}" required>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" class="form-control" name="title" value="{{ $fact->title }}" required>
-    </div>
-
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Update</button>
-    </div>
-</form>
+</form>           

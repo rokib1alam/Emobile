@@ -1,7 +1,8 @@
 @php
     $setting = App\Models\setting::first();
 @endphp
-{{-- <link rel="icon" href="{{ url($setting->favicon) }}" type="image/x-icon"> --}}
+<link rel="icon" href="{{ url($setting->favicon) }}" type="image/x-icon">
+
 <!-- [Google Font : Public Sans] icon -->
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&amp;display=swap"
     rel="stylesheet"><!-- [Tabler Icons] https://tablericons.com -->

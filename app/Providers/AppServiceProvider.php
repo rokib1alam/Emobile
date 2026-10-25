@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\Setting;
 use App\Models\Category;
 use App\Models\Seo;
+use App\Models\Faq;
+use App\Models\Product;
 use App\Models\Smtp;
 
 class AppServiceProvider extends ServiceProvider
@@ -63,6 +65,17 @@ class AppServiceProvider extends ServiceProvider
         // SEO ডেটা শেয়ার
         $seo = Seo::first();
         view()->share('seo', $seo);
+        
+        View::composer('*', function ($view) {
+            $view->with('faqs', Faq::take(3)->get());
+            $featuredProducts = Product::where('featured', 1)
+                ->with('colors') 
+                ->oldest()
+                ->take(6)
+                ->get();
+
+            $view->with('featured', $featuredProducts);
+        });
 
         // Categories ডেটা শেয়ার (with relations)
         $categories = Category::with('subcategories.childCategories')->withCount('products')->get();

@@ -13,9 +13,8 @@
   <body>
     <div class="container">
       <div class="left-side">
-        <div style="display: flex; align-items: center; margin-top: 30px;">
-            <i class="bx bxl-xing" style="font-size: 32px;"></i>
-            <img src="{{ asset('/' . $setting->logo)}}" alt="Logo" style="height: 50px; width: auto;" />
+        <div style="display: flex; align-items: center; margin-top: 30px;"> 
+            <img src="{{ asset('/' . $setting->logo)}}" alt="Logo" style="height: 50px; width: auto;"/>
         </div>
 
         <div class="text-left-side" style="margin-top: 20px;">

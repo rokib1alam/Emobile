@@ -148,7 +148,7 @@
                         <li class="pc-item"><a class="pc-link" href="{{ route('website.index') }}">Website Setting</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('page.index') }}">Page Management</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('smtp.index') }}">SMTP Setting</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('registered-admins.index') }}">Registred Admin</a></li>registered-admins
+                        <li class="pc-item"><a class="pc-link" href="{{ route('registered-admins.index') }}">Registred Admin</a></li>
                     </ul>
                 </li>
 

@@ -5,101 +5,96 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Support\Str;
-use Raziul\Sslcommerz\Facades\Sslcommerz;
-use Cart;
 
 class CheckoutController extends Controller
 {
     /**
-     * Show checkout page
+     * Show checkout page and fetch product details via product_id
      */
-    public function show()
+    public function show(Request $request)
     {
-        if (Cart::count() == 0) {
-            return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
+        $productId = $request->query('product_id');
+        if (!$productId) {
+            return redirect('/')->with('error', 'Please select a product first!');
         }
-
-        return view('frontend.pages.checkout');
+        $product = Product::findOrFail($productId);
+        return view('frontend.pages.checkout', compact('product'));
     }
 
     /**
-     * Place order and initiate SSLCommerz payment
+     * Place order (Cash on Delivery) - Admin Approval Mode
      */
     public function placeOrder(Request $request)
     {
-        // Validate input data
+        // ইনপুট ভ্যালিডেশন
         $request->validate([
-            'billing_fname'   => 'required|string',
-            'billing_email'   => 'required|email',
-            'billing_phone'   => 'required|string',
+            'billing_fname'   => 'required|string|max:255',
+            'billing_phone'   => ['required', 'string', 'regex:/^(?:\+88|88)?(01[3-9]\d{8})$/'],
+            'billing_email'   => 'required|email:rfc,dns', 
             'billing_address' => 'required|string',
-            'amount'          => 'required|numeric',
-            'payment_method'  => 'required|string|in:sslcommerz',
+            'product_id'      => 'required|exists:products,id',
+            'quantity'        => 'required|integer|min:1',
+        ], [
+            'billing_phone.regex'    => 'দয়া করে একটি সঠিক বাংলাদেশী ফোন নম্বর দিন (যেমন: 017XXXXXXXX)।',
+            'billing_email.required' => 'ইমেইল অ্যাড্রেস প্রদান করা বাধ্যতামূলক।',
+            'billing_email.email'    => 'দয়া করে একটি সঠিক ও ভ্যালিড ইমেইল অ্যাড্রেস দিন।',
         ]);
 
-        // Generate unique transaction id
-        $tran_id = Str::uuid()->toString();
+        $product = Product::findOrFail($request->product_id);
 
-        // Create the order record
+        // মূল্য ও ডেলিভারি চার্জ হিসাব (ডেলিভারি চার্জ ১৫০ টাকা)
+        $unitPrice = $product->discount_price ?? $product->selling_price;
+        $productTotal = $unitPrice * $request->quantity;
+        $deliveryCharge = 150; 
+        $totalAmount = $productTotal + $deliveryCharge;
+
+        // ইউনিক ইনভয়েস কোড জেনারেট
+        $invoice = 'ORD-' . strtoupper(Str::random(6));
+
+        // ডাটাবেজে অর্ডার তৈরি (প্রাথমিক স্ট্যাটাস pending থাকবে)
         $order = Order::create([
-            'user_id'        => auth()->id(),
-            'name'           => $request->billing_fname,
-            'email'          => $request->billing_email,
-            'phone'          => $request->billing_phone,
-            'address'        => $request->billing_address,
-            'amount'         => $request->amount,
-            'currency'       => 'BDT',
-            'transaction_id' => $tran_id,
-            'status'         => 'pending',
-            'payment_method' => 'sslcommerz',
-            'payment_status' => 'pending',
+            'user_id'          => auth()->check() ? auth()->id() : null,
+            'name'             => $request->billing_fname,
+            'email'            => $request->billing_email,
+            'phone'            => $request->billing_phone,
+            'address'          => $request->billing_address,
+            'amount'           => $totalAmount,
+            'currency'         => 'BDT',
+            'transaction_id'   => 'COD-' . strtoupper(Str::random(10)), // সিকিউর ট্রানজেকশন আইডি
+            'status'           => 'pending', // অ্যাডমিন এপ্রুভ করার আগ পর্যন্ত পেন্ডিং থাকবে
+            'payment_method'   => 'Cash on Delivery',
+            'payment_status'   => 'pending',
         ]);
 
-        // Save all order items from the cart
-        foreach (Cart::content() as $cartItem) {
-            // কার্ট আইডি থেকে অংশগুলো বের করো
-            $parts = explode('-', $cartItem->id);
+        // অর্ডার আইটেম সেভ
+        $order->items()->create([
+            'product_id' => $product->id,
+            'quantity'   => $request->quantity,
+            'price'      => $unitPrice,
+            'attributes' => json_encode([
+                'size'  => $request->size ?? null,
+                'color' => $request->color ?? null,
+            ]),
+        ]);
 
-            $product_id = (int) $parts[0];  // প্রথম অংশ product_id
-            $size = $parts[1] ?? null;      // দ্বিতীয় অংশ size
-            $color = $parts[2] ?? null;     // তৃতীয় অংশ color
+        // নোট: কাস্টমার অর্ডার করার সাথে সাথে Steadfast API কল হবে না। 
+        // অ্যাডমিন প্যানেল থেকে এপ্রুভ করার পর Steadfast-এ পার্সেল বুকিং হবে।
 
-            $order->items()->create([
-                'product_id' => $product_id,
-                'quantity'   => $cartItem->qty,
-                'price'      => $cartItem->price,
-                'attributes' => json_encode([
-                    'size'      => $size,
-                    'color'     => $color,
-                    'thumbnail' => $cartItem->options->thumbnail ?? null,
-                ]),
-            ]);
-        }
-
-
-        // Initiate payment with SSLCommerz and set callback URLs
-        $response = Sslcommerz::setOrder($order->amount, $tran_id, "Order #".$order->id)
-            ->setCustomer($order->name, $order->email, $order->phone)
-            ->setShippingInfo(Cart::count(), $order->address)
-            ->makePayment(); // callback URLs config থেকে নেওয়া হবে
-
-        if ($response->success()) {
-            return redirect($response->gatewayPageURL());
-        }
-
-        return redirect()->back()->with('error', 'Payment initiation failed');
+        return redirect()->route('order.invoice', $order->transaction_id)
+                         ->with('success', 'আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!');
     }
 
     /**
-     * Show invoice page after payment success
+     * Show invoice page using transaction_id
      */
-    public function invoice($id)
+    public function invoice($transactionId)
     {
-        $order = Order::with('items.product')->findOrFail($id);
-
-        // Authorize: only order owner can view invoice
-        if (auth()->id() !== $order->user_id) {
+        $order = Order::with('items.product')->where('transaction_id', $transactionId)->firstOrFail();
+        
+        // নিরাপত্তা যাচাই: অন্য কেউ যাতে ইউরআলে আইডি বদলে অন্যের ইনভয়েস দেখতে না পারে
+        if ($order->user_id !== null && auth()->check() && auth()->id() !== $order->user_id) {
             abort(403, 'Unauthorized access to invoice.');
         }
 
