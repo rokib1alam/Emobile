@@ -66,88 +66,7 @@
                     </div>
                 </div>
                 <div class="row shop_container">
-                {{-- @foreach ($products as $product)
-                    <div class="col-md-4 col-6">
-                        <div class="product">
-                            <div class="product_img">
-                                <a href="{{ route('product.details', $product->product_slug) }}">
-                                    <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->product_name }}">
-                                </a>
-                                <div class="product_action_box">
-                                    <ul class="list_none pr_action_btn">
-                                        <li class="add-to-cart">
-                                            <button class="btn btn-fill-out btn-radius add-to-cart"
-                                                    data-id="{{ $product->id }}"
-                                                    data-price="{{ $product->discount_price ?? $product->selling_price }}"
-                                                    data-color="{{ explode(',', $product->color)[0] ?? '' }}"
-                                                    data-size="{{ explode(',', $product->size)[0] ?? '' }}"
-                                                    data-qty="1">
-                                                <i class="icon-basket-loaded"></i>
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0)" onclick="addToCompare({{ $product->id }})" >
-                                                <i class="icon-shuffle"></i> Compare
-                                            </a>
-                                        </li>
-                                        <li><a href="#" id="{{ $product->id }}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
-                                        <li><a href="#"><i class="icon-heart"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="product_info">
-                                <h6 class="product_title">
-                                    <a href="{{ route('product.details', $product->product_slug) }}">{{ $product->product_name }}</a>
-                                </h6>
-                                <div class="product_price">
-                                    @if ($product->discount_price)
-                                        <span class="price">{{ $setting->currency }}{{ number_format($product->discount_price, 2) }}</span>
-                                        <del>{{ $setting->currency }}{{ number_format($product->selling_price, 2) }}</del>
-                                        @php
-                                            $discount = round((($product->selling_price - $product->discount_price) / $product->selling_price) * 100);
-                                        @endphp
-                                        <div class="on_sale"><span>{{ $discount }}% Off</span></div>
-                                    @else
-                                        <span class="price">${{ number_format($product->selling_price, 2) }}</span>
-                                    @endif
-                                </div>
-                                <div class="rating_wrap">
-                                    <div class="rating">
-                                        <div class="product_rate" style="width:{{ ($product->averageRating / 5) * 100 }}%"></div>
-                                    </div>
-                                    <span class="rating_num">({{ $product->reviewCount }})</span>
-                                </div>
-                                <div class="pr_desc">
-                                    <p>{{ Str::limit($product->short_description ?? 'No description available', 100) }}</p>
-                                </div>
-                                <div class="pr_switch_wrap">
-                                    <div class="product_color_switch">
-                                        @php
-                                            $colors = explode(',', $product->color);
-                                        @endphp
-                                        @foreach ($colors as $color)
-                                            <span data-color="{{ $color }}"></span>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                <div class="list_product_action_box">
-                                    <ul class="list_none pr_action_btn">
-                                        <li class="add-to-cart">
-                                            <a href="javascript:void(0);"
-                                            class="add-to-cart-btn"
-                                            data-id="{{ $product->id }}">
-                                            <i class="icon-basket-loaded"></i> Add To Cart
-                                            </a>
-                                        </li>
-                                        <li><a href="shop-compare.html" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                        <li><a href="#" class="popup-ajax" data-bs-toggle="modal" data-bs-target="#quickviewModal" data-id="{{ $product->id }}"><i class="icon-magnifier-add"></i></a></li>
-                                        <li><a href="#"><i class="icon-heart"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach --}}
+
                 @foreach ($products as $featur)
                     @php
                         $imgSrc = $featur->colors?->first()?->thumbnail 
@@ -168,76 +87,59 @@
                         }
                     @endphp
 
-                    <div class="col-md-4 col-6">
-                        <div class="product_box text-center">
-                            <div class="product_img">
-                                <a href="{{ route('product.details', $featur->product_slug) }}">
-                                    <img src="{{ $finalImage }}" alt="{{ $featur->product_name }}">
-                                </a>
-                                <div class="product_action_box">
-                                    <ul class="list_none pr_action_btn">
-                                        <li>
-                                            <a href="javascript:void(0)" onclick="addToCompare({{ $featur->id }})">
-                                                <i class="icon-shuffle"></i> Compare
-                                            </a>
-                                        </li>
-                                        <li><a href="#" id="{{$featur->id}}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
-                                        <li><a href="{{ route('wishlist.add', $featur->id) }}"><i class="icon-heart"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="product_info">
-                                <h6 class="product_title">
-                                    <a href="{{ route('product.details', $featur->product_slug) }}">{{ $featur->product_name }}</a>
-                                </h6>
-                                <div class="product_price">
-                                    @if ($featur->discount_price == null)
-                                        <span class="price">{{ $setting->currency }}{{ number_format((float) $featur->selling_price, 2) }}</span>
-                                    @else
-                                        <span class="price">{{ $setting->currency }}{{ number_format((float) $featur->discount_price, 2) }}</span>
-                                        <del>{{ $setting->currency }}{{ number_format((float) $featur->selling_price, 2) }}</del>
-                                        @php
-                                            $sellingPrice = (float) $featur->selling_price;
-                                            $discountPrice = (float) $featur->discount_price;
-                                            $discount = round(($sellingPrice - $discountPrice) / $sellingPrice * 100);
-                                        @endphp
-                                        <br>
-                                        <div class="on_sale">
-                                            <span>{{ $discount }}% Off</span>
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="rating_wrap">
-                                    <div class="rating">
-                                        <div class="product_rate" style="width:{{ ($featur->averageRating / 5) * 100 }}%"></div>
-                                    </div>
-                                    <span class="rating_num">({{ $featur->reviewCount }})</span>
-                                </div>
-                                <div class="pr_desc">
-                                    <p>{{ Str::limit($featur->short_description ?? 'No description available', 100) }}</p>
-                                </div>
-                                @php
-                                    $sizes = explode(',', $featur->size);
-                                    $colors = explode(',', $featur->color);
-                                    $defaultSize = $sizes[0] ?? '';
-                                    $defaultColor = $colors[0] ?? '';
-                                    $price = $featur->discount_price ?? $featur->selling_price;
-                                @endphp
-
-                                <div class="add-to-cart">
-                                    <button class="btn btn-fill-out btn-radius add-to-cart"
-                                            data-id="{{ $featur->id }}"
-                                            data-price="{{ $featur->discount_price ?? $featur->selling_price }}"
-                                            data-color="{{ $colors[0] ?? '' }}"
-                                            data-size="{{ $sizes[0] ?? '' }}"
-                                            data-qty="1">
-                                        <i class="icon-basket-loaded"></i> Add To Cart
-                                    </button>
-                                </div>
-
+                <div class="col-md-4 col-6">
+                    <div class="product_box text-center">
+                        <div class="product_img">
+                            <a href="{{ route('product.details', $featur->product_slug) }}">
+                                <img src="{{ $finalImage }}" alt="{{ $featur->product_name }}">
+                            </a>
+                            <div class="product_action_box">
+                                <ul class="list_none pr_action_btn">
+                                    {{-- Quick View Button --}}
+                                    <li>
+                                        <a href="#" id="{{ $featur->id }}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal" title="Quick View">
+                                            <i class="icon-magnifier-add"></i>
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
+                        <div class="product_info">
+                            <h6 class="product_title">
+                                <a href="{{ route('product.details', $featur->product_slug) }}">{{ $featur->product_name }}</a>
+                            </h6>
+                            <div class="product_price">
+                                @if ($featur->discount_price == null)
+                                    <span class="price">{{ $setting->currency ?? '$' }}{{ number_format((float) $featur->selling_price, 2) }}</span>
+                                @else
+                                    <span class="price">{{ $setting->currency ?? '$' }}{{ number_format((float) $featur->discount_price, 2) }}</span>
+                                    <del>{{ $setting->currency ?? '$' }}{{ number_format((float) $featur->selling_price, 2) }}</del>
+                                    @php
+                                        $sellingPrice = (float) $featur->selling_price;
+                                        $discountPrice = (float) $featur->discount_price;
+                                        $discount = round(($sellingPrice - $discountPrice) / $sellingPrice * 100);
+                                    @endphp
+                                    <br>
+                                    <div class="on_sale">
+                                        <span>{{ $discount }}% Off</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="pr_desc">
+                                <p>{{ Str::limit($featur->short_description ?? 'No description available', 100) }}</p>
+                            </div>
+
+                            {{-- Buy Now Button (Class changed from add-to-cart to buy-now-wrapper) --}}
+                            <div class="buy-now-wrapper mt-3">
+                                <a href="{{ route('checkout', ['product_id' => $featur->id, 'qty' => 1]) }}" class="btn btn-fill-out btn-radius w-100">
+                                    <i class="icon-bag me-1"></i> Buy Now
+                                </a>
+                            </div>
+
+                        </div>
                     </div>
+                </div>
                 @endforeach
                 </div>
         		<div class="row">
@@ -263,25 +165,7 @@
                             @endforeach
                         </ul>
                     </div>
-                    <div class="widget">
-                        <h5 class="widget_title">Filter</h5>
-                        <form method="GET" id="priceFilterForm">
-                            <div class="filter_price">
-                                <div id="price_filter"
-                                    data-min="0"
-                                    data-max="5000"
-                                    data-min-value="{{ request('min_price', 0) }}"
-                                    data-max-value="{{ request('max_price', 5000) }}"
-                                    data-price-sign="{{ $setting->currency ?? '$' }}">
-                                </div>
-                                <div class="price_range mt-2">
-                                    <span>Price: <span id="flt_price">{{ request('min_price', 0) }} - {{ request('max_price', 5000) }}</span></span>
-                                    <input type="hidden" id="price_first" name="min_price" value="{{ request('min_price', 0) }}">
-                                    <input type="hidden" id="price_second" name="max_price" value="{{ request('max_price', 5000) }}">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                   
 
                     <!-- Brand Filter -->
                     <div class="widget">
@@ -298,26 +182,6 @@
                             </li>
                             @endforeach
                         </ul>
-                    </div>
-
-                    <!-- Size Filter -->
-                    <div class="widget">
-                        <h5 class="widget_title">Size</h5>
-                        <div class="product_size_switch">
-                            @foreach($sizes as $size)
-                                <span>{{ $size }}</span>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Color Filter -->
-                    <div class="widget">
-                        <h5 class="widget_title">Color</h5>
-                        <div class="product_color_switch">
-                            @foreach($colors as $color)
-                                <span data-color="{{ $color }}"></span>
-                            @endforeach
-                        </div>
                     </div>
 
                 </div>

@@ -183,12 +183,7 @@
                                                                 </div>
                                                             @endif
                                                         </div>
-                                                        <div class="rating_wrap">
-                                                            <div class="rating">
-                                                                <div class="product_rate" style="width:{{ ($featur->averageRating / 5) * 100 }}%"></div>
-                                                            </div>
-                                                            <span class="rating_num">({{ $featur->reviewCount }})</span>
-                                                        </div>
+                   
                                                     </div>
                                                 </div>
                                             </div>
@@ -254,12 +249,7 @@
                                                                 </div>
                                                             @endif
                                                         </div>
-                                                        <div class="rating_wrap">
-                                                            <div class="rating">
-                                                                <div class="product_rate" style="width:{{ ($product->averageRating / 5) * 100 }}%"></div>
-                                                            </div>
-                                                            <span class="rating_num">({{ $product->reviewCount }})</span>
-                                                        </div>
+                                                   
                                                     </div>
                                                 </div>
                                             </div>
@@ -742,7 +732,6 @@
                                 <div class="product_slider carousel_slider owl-carousel owl-theme dot_style1" data-loop="false" data-margin="20" data-responsive='{"0":{"items": "1"}, "481":{"items": "2"}, "768":{"items": "3"}, "991":{"items": "4"}}'>
                                     @foreach ($trendy_product as $product)
                                         @php
-                                            
                                             $primaryImage = null;
                                             if (isset($product->colors) && count($product->colors) > 0 && !empty($product->colors->first()->thumbnail)) {
                                                 $primaryImage = $product->colors->first()->thumbnail;
@@ -765,10 +754,19 @@
                                                     </a>
                                                     <div class="product_action_box">
                                                         <ul class="list_none pr_action_btn">
-                                                            <li class="add-to-cart"><a href="#"><i class="icon-basket-loaded"></i> Add To Cart</a></li>
-                                                            <li><a href="shop-compare.html" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                                            <li><a href="#" id="{{ $product->id }}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
-                                                            <li><a href="{{ route('wishlist.add', $product->id) }}"><i class="icon-heart"></i></a></li>
+                                                            {{-- Buy Now Direct Link (No JS Loading Class) --}}
+                                                            <li class="buy-now-item">
+                                                                <a href="{{ route('checkout', ['product_id' => $product->id, 'qty' => 1]) }}" class="btn-buy-now">
+                                                                    <i class="icon-bag"></i> Buy Now
+                                                                </a>
+                                                            </li>
+                                                            
+                                                            {{-- Quick View Button --}}
+                                                            <li>
+                                                                <a href="#" id="{{ $product->id }}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal" title="Quick View">
+                                                                    <i class="icon-magnifier-add"></i>
+                                                                </a>
+                                                            </li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -782,12 +780,7 @@
                                                             <del>{{ $setting->currency ?? '$' }}{{ number_format($sellingPrice, 2) }}</del>
                                                         @endif
                                                     </div>
-                                                    <div class="rating_wrap">
-                                                        <div class="rating">
-                                                            <div class="product_rate" style="width:{{ (($product->averageRating ?? 0) / 5) * 100 }}%"></div>
-                                                        </div>
-                                                        <span class="rating_num">({{ $product->reviewCount ?? 0 }})</span>
-                                                    </div>
+                                                  
                                                 </div>
                                             </div>
                                         </div>
@@ -812,10 +805,10 @@
                 ->limit(24)
                 ->get();
 
-            foreach ($cat_product as $product) {
-                $product->reviewCount = App\Models\review::where('product_id', $product->id)->count();
-                $product->averageRating = App\Models\review::where('product_id', $product->id)->avg('rating');
-            }
+            // foreach ($cat_product as $product) {
+            //     $product->reviewCount = App\Models\review::where('product_id', $product->id)->count();
+            //     $product->averageRating = App\Models\review::where('product_id', $product->id)->avg('rating');
+            // }
         @endphp
 
         <div class="section small_pt small_pb">
@@ -848,13 +841,11 @@
                                                     ?? null;
 
                                             if ($imgSrc) {
-                                                
                                                 if (str_starts_with($imgSrc, 'public/')) {
                                                     $imgSrc = substr($imgSrc, 7);
                                                 }
                                                 $finalImage = asset($imgSrc);
                                             } else {
-                                                
                                                 $finalImage = asset('frontend/assets/images/no-image.png');
                                             }
                                         @endphp
@@ -868,10 +859,19 @@
                                                     </a>
                                                     <div class="product_action_box">
                                                         <ul class="list_none pr_action_btn">
-                                                            <li class="add-to-cart"><a href="#"><i class="icon-basket-loaded"></i> Add To Cart</a></li>
-                                                            <li><a href="shop-compare.html" class="popup-ajax"><i class="icon-shuffle"></i></a></li>
-                                                            <li><a href="#" id="{{ $product->id }}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal"><i class="icon-magnifier-add"></i></a></li>
-                                                            <li><a href="{{ route('wishlist.add', $product->id) }}"><i class="icon-heart"></i></a></li>
+                                                            {{-- Buy Now Button (Direct Link, No JS Loading Class) --}}
+                                                            <li class="buy-now-item">
+                                                                <a href="{{ route('checkout', ['product_id' => $product->id, 'qty' => 1]) }}" class="btn-buy-now">
+                                                                    <i class="icon-bag"></i> Buy Now
+                                                                </a>
+                                                            </li>
+                                                            
+                                                            {{-- Quick View Button --}}
+                                                            <li>
+                                                                <a href="#" id="{{ $product->id }}" class="Quickview" data-bs-toggle="modal" data-bs-target="#quickviewModal" title="Quick View">
+                                                                    <i class="icon-magnifier-add"></i>
+                                                                </a>
+                                                            </li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -879,10 +879,10 @@
                                                     <h6 class="product_title"><a href="{{ route('product.details', $product->product_slug) }}">{{ $product->product_name }}</a></h6>
                                                     <div class="product_price">
                                                         @if ($product->discount_price == null)
-                                                            <span class="price">{{ $setting->currency }}{{ number_format((float) $product->selling_price, 2) }}</span>
+                                                            <span class="price">{{ $setting->currency ?? '$' }}{{ number_format((float) $product->selling_price, 2) }}</span>
                                                         @else
-                                                            <span class="price">{{ $setting->currency }}{{ number_format((float) $product->discount_price, 2) }}</span>
-                                                            <del>{{ $setting->currency }}{{ number_format((float) $product->selling_price, 2) }}</del>
+                                                            <span class="price">{{ $setting->currency ?? '$' }}{{ number_format((float) $product->discount_price, 2) }}</span>
+                                                            <del>{{ $setting->currency ?? '$' }}{{ number_format((float) $product->selling_price, 2) }}</del>
                                                             @php
                                                                 $sellingPrice = (float) $product->selling_price;
                                                                 $discountPrice = (float) $product->discount_price;
@@ -895,12 +895,7 @@
                                                         @endif
                                                     </div>
                                                     
-                                                    <div class="rating_wrap">
-                                                        <div class="rating">
-                                                            <div class="product_rate" style="width:{{ ($product->averageRating / 5) * 100 }}%"></div>
-                                                        </div>
-                                                        <span class="rating_num">({{ $product->reviewCount }})</span>
-                                                    </div>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -997,12 +992,7 @@
                                                             </div>
                                                         @endif
                                                     </div>
-                                                    <div class="rating_wrap">
-                                                        <div class="rating">
-                                                            <div class="product_rate" style="width:{{ ($product->averageRating / 5) * 100 }}%"></div>
-                                                        </div>
-                                                        <span class="rating_num">({{ $product->reviewCount }})</span>
-                                                    </div>
+                                                    
                                                     {{-- <div class="pr_desc">
                                                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus blandit massa enim. Nullam id varius nunc id varius nunc.</p>
                                                     </div> --}}
@@ -1061,12 +1051,7 @@
                                                             </div>
                                                         @endif
                                                     </div>
-                                                    <div class="rating_wrap">
-                                                        <div class="rating">
-                                                            <div class="product_rate" style="width:{{ ($product->averageRating / 5) * 100 }}%"></div>
-                                                        </div>
-                                                        <span class="rating_num">({{ $product->reviewCount }})</span>
-                                                    </div>
+                                                    
                                                     {{-- <div class="pr_desc">
                                                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus blandit massa enim. Nullam id varius nunc id varius nunc.</p>
                                                     </div> --}}
@@ -1124,12 +1109,7 @@
                                                             </div>
                                                         @endif
                                                     </div>
-                                                    <div class="rating_wrap">
-                                                        <div class="rating">
-                                                            <div class="product_rate" style="width:{{ ($product->averageRating / 5) * 100 }}%"></div>
-                                                        </div>
-                                                        <span class="rating_num">({{ $product->reviewCount }})</span>
-                                                    </div>
+                                                    
                                                     {{-- <div class="pr_desc">
                                                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus blandit massa enim. Nullam id varius nunc id varius nunc.</p>
                                                     </div> --}}

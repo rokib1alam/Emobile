@@ -38,7 +38,7 @@
                     </a>
                 </div>
 
-                <!-- PRODUCT GALLERY SLIDER (পাশাপাশি শো করার জন্য ফিক্সড) -->
+                <!-- PRODUCT GALLERY SLIDER -->
                 <div id="pr_item_gallery" class="product_gallery_item mt-3" style="display: flex; gap: 10px; overflow-x: auto;">
                     @if(!empty($selectedImages))
                         @foreach ($selectedImages as $key => $image)
@@ -121,15 +121,6 @@
                             </div>
                         @endif
                     </div>
-
-                    <!-- RATING -->
-                    <div class="rating_wrap">
-                        <div class="rating">
-                            <div class="product_rate" style="width:{{ (($averageRating ?? 0) / 5) * 100 }}%"></div>
-                        </div>
-                        <span class="rating_num">({{ $reviewCount ?? 0 }})</span>
-                    </div>
-
                     <br>
 
                     <!-- SHORT DESCRIPTION -->
@@ -159,11 +150,11 @@
                                         $cImages = is_array($colorItem->images) ? $colorItem->images : json_decode($colorItem->images, true);
                                     @endphp
                                     <span class="color_option {{ $key == 0 ? 'active' : '' }}" 
-                                          data-color="{{ $colorItem->color }}" 
-                                          data-thumbnail="{{ asset($colorItem->thumbnail) }}"
-                                          data-images='{!! json_encode($cImages ?? []) !!}'
-                                          style="background-color: {{ $colorItem->color }}; cursor: pointer;"
-                                          title="{{ $colorItem->color }}">
+                                        data-color="{{ $colorItem->color }}" 
+                                        data-thumbnail="{{ asset($colorItem->thumbnail) }}"
+                                        data-images='{!! json_encode($cImages ?? []) !!}'
+                                        style="background-color: {{ $colorItem->color }}; cursor: pointer;"
+                                        title="{{ $colorItem->color }}">
                                     </span>
                                 @endforeach
                             @else
@@ -192,43 +183,31 @@
                 <hr />
 
                 <!-- =====================================
-                    ADD TO CART FORM (পাশাপাশি সাজানো)
+                    BUY NOW SECTION (আপনার চাওয়া স্টাইল অনুযায়ী)
                 ====================================== -->
-                <form action="{{ route('add.to.cart.quickview') }}" method="POST" id="add_cart_form">
-                    @csrf
-                    <input type="hidden" name="id" value="{{ $product->id }}">
-                    <input type="hidden" name="price" value="{{ $product->discount_price ?? $product->selling_price }}" id="product-price">
-                    <input type="hidden" name="product_color_id" value="{{ $selectedColor->id ?? '' }}" id="product-color-id">
-                    <input type="hidden" name="color" value="{{ $selectedColor->color ?? '' }}" id="product-color">
-                    <input type="hidden" name="size" value="{{ $size[0] ?? '' }}" id="product-size">
-
-                    <div class="cart_extra d-flex align-items-center flex-wrap gap-2">
-                        <!-- Quantity Box -->
-                        <div class="cart-product-quantity">
-                            <div class="quantity">
-                                <input type="button" value="-" class="minus">
-                                <input type="text" name="qty" value="1" title="Qty" class="qty" size="4">
-                                <input type="button" value="+" class="plus">
-                            </div>
+                <div class="cart_extra d-flex align-items-center flex-wrap gap-2">
+                    <!-- Quantity Box -->
+                    <div class="cart-product-quantity">
+                        <div class="quantity">
+                            <input type="button" value="-" class="minus">
+                            <input type="text" name="qty" value="1" title="Qty" class="qty" id="product-qty" size="4">
+                            <input type="button" value="+" class="plus">
                         </div>
-
-                        <!-- Add to Cart Button -->
-                        <div class="cart_btn">
-                            @if($product->stock_quantity < 1)
-                                <button class="btn btn-fill-outline-danger" disabled>
-                                    <i class="icon-basket-loaded"></i> Stock Out
-                                </button>
-                            @else
-                                <button class="btn btn-fill-out btn-addtocart" type="submit">
-                                    <i class="icon-basket-loaded"></i>
-                                    <span class="loading d-none">....</span>
-                                    Add to cart
-                                </button>
-                            @endif
-                        </div>
-
                     </div>
-                </form>
+
+                    <!-- Buy Now Button -->
+                    <div class="cart_btn">
+                        @if($product->stock_quantity < 1)
+                            <button class="btn btn-fill-outline-danger" disabled>
+                                <i class="icon-bag"></i> Stock Out
+                            </button>
+                        @else
+                            <a href="{{ route('checkout', ['product_id' => $product->id]) }}" id="buy_now_btn" class="btn btn-fill-out buy-now-btn" title="Buy Now">
+                                <i class="icon-bag"></i> Buy Now
+                            </a>
+                        @endif
+                    </div>
+                </div>
 
                 <hr />
 
@@ -263,156 +242,64 @@
     </div>
 </div>
 
+<!-- Hidden inputs for JS values -->
+<input type="hidden" id="selected-color" value="{{ optional($product->colors->first())->color ?? '' }}">
+<input type="hidden" id="selected-size" value="{{ $size[0] ?? '' }}">
+
 <!-- =========================================
-     SCRIPTS & JAVASCRIPT LOGIC
+    SCRIPTS & JAVASCRIPT LOGIC
 ========================================== -->
 <script>
     $(document).ready(function() {
-        // Color Selection & Dynamic Image Switch
+        // Color Selection
         $('.color_option').on('click', function() {
             var selectedColor = $(this).data('color');
-            var colorId = $(this).data('color-id');
             var thumbnail = $(this).data('thumbnail');
             var rawImages = $(this).attr('data-images');
 
-            $('#product-color').val(selectedColor);
-            $('#product-color-id').val(colorId);
+            $('#selected-color').val(selectedColor);
 
             $('.color_option').removeClass('active');
             $(this).addClass('active');
 
-            // Update Main Thumbnail
             if (thumbnail) {
                 $('#product_img').attr('src', thumbnail);
                 $('#product_img').attr('data-zoom-image', thumbnail);
             }
-
-            // Update Gallery Items (পাশাপাশি দেখানোর জন্য ফ্লেক্স লেআউট সহ)
-            var galleryContainer = $('#pr_item_gallery');
-            galleryContainer.html('');
-
-            try {
-                var images = typeof rawImages === 'object' ? rawImages : JSON.parse(rawImages);
-                if (images && images.length > 0) {
-                    $.each(images, function(index, imgPath) {
-                        var fullUrl = "{{ asset('') }}" + imgPath;
-                        var activeCls = index === 0 ? 'active' : '';
-                        galleryContainer.append(`
-                            <div class="item" style="flex: 0 0 70px;">
-                                <a href="#" class="product_gallery_item ${activeCls}" data-image="${fullUrl}" data-zoom-image="${fullUrl}">
-                                    <img src="${fullUrl}" alt="product_small_img${index + 1}" style="width: 70px; height: 70px; object-fit: contain; border: 1px solid #ddd; padding: 2px;" />
-                                </a>
-                            </div>
-                        `);
-                    });
-                } else if (thumbnail) {
-                    galleryContainer.append(`
-                        <div class="item" style="flex: 0 0 70px;">
-                            <a href="#" class="product_gallery_item active" data-image="${thumbnail}" data-zoom-image="${thumbnail}">
-                                <img src="${thumbnail}" alt="product_thumb" style="width: 70px; height: 70px; object-fit: contain; border: 1px solid #ddd; padding: 2px;" />
-                            </a>
-                        </div>
-                    `);
-                }
-            } catch (err) {
-                console.error("Error parsing color images:", err);
-            }
         });
 
-        // Size selection
+        // Size Selection
         $('.product_size_switch span').on('click', function() {
             var selectedSize = $(this).data('size') || $(this).text().trim();
-            $('#product-size').val(selectedSize);
+            $('#selected-size').val(selectedSize);
             $('.product_size_switch span').removeClass('active');
             $(this).addClass('active');
         });
 
-        // Add to Cart Ajax Form Submit
-        $('#add_cart_form').off('submit').on('submit', function(e) {
+        // Buy Now Button Click Action (Appending color, size, qty to URL)
+        $('#buy_now_btn').on('click', function(e) {
             e.preventDefault();
 
-            let color = $('#product-color').val();
-            let size = $('#product-size').val();
+            let color = $('#selected-color').val();
+            let size = $('#selected-size').val();
+            let qty = $('#product-qty').val();
+            let baseCheckoutUrl = $(this).attr('href');
 
             if ($('.color_option').length > 0 && !color) {
-                toastr.warning('Please select a color.');
+                if (typeof toastr !== 'undefined') {
+                    toastr.warning('Please select a color.');
+                } else {
+                    alert('Please select a color.');
+                }
                 return false;
             }
 
-            var url = $(this).attr('action');
-            var request = $(this).serialize();
-
-            $('.loading').removeClass('d-none');
-
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: request,
-                success: function(data) {
-                    toastr.options = { "positionClass": "toast-top-right", "zIndex": 99999 };
-
-                    if (data.status === 'success') {
-                        toastr.success(data.message);
-                        $('#add_cart_form')[0].reset();
-                        $('#quickviewModal').modal('hide');
-
-                        setTimeout(function () {
-                            $('body').removeClass('modal-open');
-                            $('.modal-backdrop').remove();
-                            $('body').css('overflow', 'auto');
-                        }, 500);
-
-                        if (typeof updateCart === 'function') {
-                            updateCart();
-                        }
-                    } else {
-                        toastr.error(data.message || 'Something went wrong!');
-                    }
-
-                    $('.loading').addClass('d-none');
-                },
-                error: function() {
-                    toastr.error('Something went wrong!');
-                    $('.loading').addClass('d-none');
-                }
-            });
+            // Construct final URL with query parameters
+            let finalUrl = `${baseCheckoutUrl}?color=${encodeURIComponent(color || '')}&size=${encodeURIComponent(size || '')}&qty=${qty}`;
+            
+            window.location.href = finalUrl;
         });
     });
-
-    function updateCart() {
-        $.ajax({
-            url: '{{ route("cart.items") }}',
-            type: 'GET',
-            success: function(data) {
-                $('#cart-count').text(data.cartCount);
-                $('#cart-total').html('<span class="currency_symbol">{{ $setting->currency }}</span>' + data.subtotal);
-                $('#cart-list').empty();
-
-                $.each(data.cartItems, function(index, item) {
-                    $('#cart-list').append(
-                        `<li id="cart-item-${item.rowId}">
-                            <a href="javascript:void(0);" class="item_remove remove-cart-item" data-id="${item.rowId}">
-                                <i class="icon-close"></i>
-                            </a>
-                            <a href="#">
-                                <img src="{{ asset('') }}${item.options.thumbnail}" alt="cart_thumb">
-                                ${item.name.security ? item.name : item.name.substring(0, 20)}...
-                            </a>
-                            <span class="cart_quantity">
-                                ${item.qty} x
-                                <span class="cart_amount">
-                                    <span class="price_symbole">{{ $setting->currency }}</span>${item.price}
-                                </span>
-                            </span>
-                        </li>`
-                    );
-                });
-            },
-            error: function() {
-                toastr.error('Failed to update cart.');
-            }
-        });
-    }
 </script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
