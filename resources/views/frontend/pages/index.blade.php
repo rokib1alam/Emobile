@@ -310,7 +310,7 @@
                                 @endif
 
                                 {{-- Category Name --}}
-                                <h4 style="font-size: 22px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; color: #111; display: block; word-wrap: break-word; white-space: normal;">
+                                <h4 style="font-size: 23px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; color: #111; display: block; word-wrap: break-word; white-space: normal;">
                                     {{ $categoryName }}
                                 </h4>
 
