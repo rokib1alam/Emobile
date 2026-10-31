@@ -86,10 +86,11 @@
                                 <div class="heading_s2">
                                     <h4>Exclusive Products</h4>
                                 </div>
-                                <div class="tab-style2">
-                                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#tabmenubar" aria-expanded="false"> 
-                                        <span class="ion-android-menu"></span>
+                                <div class="tab-style2" style="position: relative;">
+                                    <button class="navbar-toggler" type="button" id="menuToggleBtn" style="border: none; background: transparent; cursor: pointer; padding: 5px;"> 
+                                        <span class="ion-android-menu menu-icon" id="toggleIcon" style="font-size: 22px;"></span>
                                     </button>
+                                    
                                     <ul class="nav nav-tabs justify-content-center justify-content-md-end" id="tabmenubar" role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link active" id="featured-tab" data-bs-toggle="tab" href="#featured" role="tab" aria-controls="featured" aria-selected="true">Featured</a>

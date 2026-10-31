@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="Anil z" name="author">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="{{ $seo->meta_author ?? '' }}">
     <meta name="keywords" content="{{ $seo->meta_keyword ?? '' }}">
     <meta name="description" content="@yield('meta_description', $seo->meta_description ?? '')">

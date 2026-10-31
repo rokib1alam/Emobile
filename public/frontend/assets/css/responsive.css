@@ -43,7 +43,50 @@
 	font-size: 12px;
 }
 }
+@media only screen and (max-width: 991px) {
+    #tabmenubar {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 999;
+        background-color: #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        padding: 12px 15px;
+        width: 170px; /* বক্সের সাইজ বাড়িয়ে দেওয়া হলো যাতে এক লাইনে থাকে */
+        border-radius: 5px;
+        display: none !important;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    #tabmenubar.show {
+        display: flex !important;
+        flex-direction: column !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    #tabmenubar li.nav-item {
+        width: 100%;
+        text-align: left;
+    }
+    #tabmenubar li.nav-item a.nav-link {
+        padding: 6px 8px;
+        display: block;
+        white-space: nowrap; /* লেখা নিচে নামবে না, এক লাইনে থাকবে */
+        font-size: 14px;
+    }
+}
 
+@media only screen and (min-width: 992px) {
+    #tabmenubar {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    .mobile-menu-close-bar {
+        display: none !important;
+    }
+}
 /* -------------------------------------------------
   (min-width: 767px) and (max-width: 1199px)
 ---------------------------------------------------*/

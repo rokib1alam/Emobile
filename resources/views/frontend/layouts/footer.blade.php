@@ -46,9 +46,8 @@
                         </ul>
                     </div>
                 </div>
-
                 <div class="col-lg-4 col-md-4 col-sm-12">
-                	<div class="widget">
+                    <div class="widget">
                         <h6 class="widget_title">Product Image</h6>
                         <ul class="widget_instafeed instafeed_col4">
                             @if(isset($featured) && $featured->count() > 0)
@@ -60,9 +59,10 @@
                                     <li>
                                         <a href="{{ route('product.details', $featur->product_slug) }}">
                                             @if($relatedColor && $relatedColor->thumbnail)
-                                                <img src="{{ asset($relatedColor->thumbnail) }}" alt="insta_img" style="mix-blend-mode: multiply;">
+                                                <!-- mix-blend-mode সরিয়ে দেওয়া হয়েছে যাতে ঝাপসা না দেখায় -->
+                                                <img src="{{ asset($relatedColor->thumbnail) }}" alt="insta_img">
                                             @else
-                                                <img src="{{ asset('frontend/assets/images/no-image.png') }}" alt="insta_img" style="mix-blend-mode: multiply;">
+                                                <img src="{{ asset('frontend/assets/images/no-image.png') }}" alt="insta_img">
                                             @endif
                                         </a>
                                     </li>
@@ -70,9 +70,7 @@
                             @endif
                         </ul>
                     </div>
-                    
                 </div>
-                
             </div>
         </div>
     </div>
