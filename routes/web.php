@@ -88,7 +88,10 @@ Route::group([], function () {
 
     // Static pages
     Route::get('/new', [FrontendController::class, 'new'])->name('new');
- Route::get('/trending-products', [FrontendController::class, 'trendingProducts'])->name('trending.products');
+    Route::get('/trending-products', [FrontendController::class, 'trendingProducts'])->name('trending.products');
+    Route::get('/featured-products', [FrontendController::class,'featuredProducts'])->name('featured.products');
+    Route::get('/top-rated-products', [FrontendController::class, 'topRatedProducts'])->name('top.rated.products');
+    Route::get('/popular-products', [FrontendController::class, 'popularProducts'])->name('popular.products');
     // Catch-all slug route (must be last)
     Route::get('{slug}', [FrontendController::class, 'slugHandler'])->name('slug.handler');
 });

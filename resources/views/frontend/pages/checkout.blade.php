@@ -1,7 +1,6 @@
 @extends('layouts.app')
 @section('title','Checkout')
 @section('content')
-
 @include('frontend.layouts.nheader')
 
 <div class="breadcrumb_section bg_gray page-title-mini">
@@ -33,29 +32,27 @@
                 <div class="alert alert-danger mt-3">{{ session('error') }}</div>
             @endif
 
-            <form method="POST" action="{{ route('checkout.submit') }}">
+            <form method="POST" action="{{ route('checkout.submit') }}" id="checkoutForm">
                 @csrf
-                
                 {{-- Hidden inputs for Direct Buy Now Product --}}
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                 <input type="hidden" name="quantity" value="1">
+                
                 @php
                     $unitPrice = $product->discount_price ?? $product->selling_price;
-                    $shippingCharge = 150; // ডেলিভারি চার্জ ১৫০ টাকা
-                    $totalAmount = $unitPrice + $shippingCharge;
                 @endphp
-                <input type="hidden" name="amount" value="{{ $totalAmount }}">
-                <input type="hidden" name="delivery_charge" value="{{ $shippingCharge }}">
+
+                <input type="hidden" name="amount" id="totalAmountInput" value="{{ $unitPrice + 150 }}">
+                <input type="hidden" name="delivery_charge" id="deliveryChargeInput" value="150">
 
                 <div class="row">
                     <div class="col-12">
-                        {{-- Full Width Card with Soft Shadow --}}
                         <div class="card border-0 mb-5 overflow-hidden" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);">
                             
-                            {{-- Card Header with Red Background & Print Button --}}
+                            {{-- Card Header --}}
                             <div class="card-header d-flex justify-content-between align-items-center py-3 px-4" style="background:#FF324D; color:#fff;">
                                 <h4 class="mb-0 text-white">Billing & Order Details</h4>
-                                <button onclick="window.print()" class="btn btn-light btn-sm fw-bold">
+                                <button type="button" onclick="window.print()" class="btn btn-light btn-sm fw-bold">
                                     <i class="ti-printer me-1"></i> Print
                                 </button>
                             </div>
@@ -65,6 +62,7 @@
                                     {{-- Billing Details --}}
                                     <div class="col-md-6 border-end pe-md-5">
                                         <div class="heading_s1 mb-4"><h4>Billing details</h4></div>
+                                        
                                         <div class="form-group mb-3">
                                             <label class="fw-bold">নাম *</label>
                                             <input type="text" name="billing_fname" placeholder="আপনার সম্পূর্ণ নাম লিখুন"
@@ -74,6 +72,16 @@
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
+
+                                        {{-- Delivery Location Area Selection --}}
+                                        <div class="form-group mb-3">
+                                            <label class="fw-bold">ডেলিভারি এলাকা নির্বাচন করুন *</label>
+                                            <select name="shipping_area" id="shippingArea" class="form-control" required>
+                                                <option value="outside" selected>ঢাকার বাইরে (১৫০ টাকা)</option>
+                                                <option value="inside">ঢাকার ভেতরে (১০০ টাকা)</option>
+                                            </select>
+                                        </div>
+
                                         <div class="form-group mb-3">
                                             <label class="fw-bold">ঠিকানা *</label>
                                             <textarea name="billing_address" placeholder="বাসার নম্বর, রোড, এলাকা, থানা, জেলা" rows="3"
@@ -82,6 +90,7 @@
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
+
                                         <div class="form-group mb-3">
                                             <label class="fw-bold">ফোন নম্বর *</label>
                                             <input type="tel" name="billing_phone" placeholder="017XXXXXXXX"
@@ -93,6 +102,7 @@
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
+
                                         <div class="form-group mb-3">
                                             <label class="fw-bold">ইমেইল অ্যাড্রেস *</label>
                                             <input type="email" name="billing_email" placeholder="example@domain.com"
@@ -102,13 +112,10 @@
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
+
                                         <div class="form-group mb-3">
                                             <label class="fw-bold">Country / Region *</label>
                                             <input type="text" name="country" value="Bangladesh" class="form-control bg-light" readonly>
-                                        </div>
-                                        <div class="form-group mb-3">
-                                            <label class="fw-bold">ডেলিভারি চার্জ</label>
-                                            <input type="text" value="Standard Delivery - ৳{{ $shippingCharge }}" class="form-control bg-light" readonly>
                                         </div>
                                     </div>
 
@@ -145,25 +152,50 @@
                                                         </tr>
                                                         <tr>
                                                             <th>Shipping</th>
-                                                            <td class="text-end fw-bold">৳{{ $shippingCharge }}</td>
+                                                            <td class="text-end fw-bold" id="shippingDisplay">৳150</td>
                                                         </tr>
                                                         <tr>
                                                             <th>Total</th>
-                                                            <td class="text-end text-danger fw-bold fs-5"><strong>৳{{ number_format($totalAmount, 2) }}</strong></td>
+                                                            <td class="text-end text-danger fw-bold fs-5"><strong id="totalDisplay">৳{{ number_format($unitPrice + 150, 2) }}</strong></td>
                                                         </tr>
                                                     </tfoot>
                                                 </table>
                                             </div>
                                         </div>
+
+                                        {{-- Payment Methods Selection --}}
                                         <div class="payment_method mb-4">
-                                            <div class="heading_s1 mb-3"><h4>ক্যাশ অন ডেলিভারি</h4></div>
-                                            <div class="p-3 bg-light border rounded mb-3">
-                                                <p class="mb-0 text-muted"><i class="fas fa-truck me-2"></i> পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন।</p>
+                                            <div class="heading_s1 mb-3"><h4>পেমেন্ট মাধ্যম নির্বাচন করুন *</h4></div>
+                                            
+                                            <div class="payment_options">
+                                                <div class="form-check p-3 bg-light border rounded mb-2">
+                                                    <input class="form-check-input" type="radio" name="payment_method" id="paymentCod" value="cod" checked>
+                                                    <label class="form-check-label fw-bold ms-2" for="paymentCod">
+                                                        <i class="fas fa-truck text-danger me-2"></i> ক্যাশ অন ডেলিভারি (COD)
+                                                    </label>
+                                                    <p class="text-muted small mb-0 mt-1 ms-4">পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন।</p>
+                                                </div>
+
+                                                <div class="form-check p-3 bg-light border rounded mb-2">
+                                                    <input class="form-check-input" type="radio" name="payment_method" id="paymentBkash" value="bkash">
+                                                    <label class="form-check-label fw-bold ms-2" for="paymentBkash">
+                                                        <i class="fas fa-mobile-alt text-pink me-2" style="color: #e2136e;"></i> বিকাশ (bKash)
+                                                    </label>
+                                                    <p class="text-muted small mb-0 mt-1 ms-4">বিকাশ পেমেন্টের ক্ষেত্রে আমাদের মার্চেন্ট অ্যাকাউন্ট বা সেন্ড মানি নির্দেশাবলী অনুসরণ করুন।</p>
+                                                </div>
+
+                                                <div class="form-check p-3 bg-light border rounded mb-3">
+                                                    <input class="form-check-input" type="radio" name="payment_method" id="paymentBank" value="bank_transfer">
+                                                    <label class="form-check-label fw-bold ms-2" for="paymentBank">
+                                                        <i class="fas fa-university text-primary me-2"></i> ব্যাংক ট্রান্সফার (Bank Transfer)
+                                                    </label>
+                                                    <p class="text-muted small mb-0 mt-1 ms-4">সরাসরি আমাদের ব্যাংক অ্যাকাউন্টে টাকা পাঠিয়ে ট্রানজেকশন আইডি দিন।</p>
+                                                </div>
                                             </div>
-                                            <input type="hidden" name="payment_method" value="cod">
                                         </div>
+
                                         <button type="submit" class="btn btn-fill-out btn-addtocart w-100 py-3">
-                                            <i class="fas fa-lock me-2"></i> এখানে ক্লিক করে অর্ডার কনফার্ম করুন ৳{{ number_format($totalAmount, 2) }}
+                                            <i class="fas fa-lock me-2"></i> অর্ডার কনফার্ম করুন (<span id="buttonTotalText">৳{{ number_format($unitPrice + 150, 2) }}</span>)
                                         </button>
                                     </div>
                                 </div>
@@ -176,6 +208,33 @@
     </div>
 </div>
 
-@include('frontend.layouts.footer')
+{{-- JavaScript to dynamically update delivery charge & total amount --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const unitPrice = {{ $unitPrice }};
+        const shippingAreaSelect = document.getElementById('shippingArea');
+        const shippingDisplay = document.getElementById('shippingDisplay');
+        const totalDisplay = document.getElementById('totalDisplay');
+        const buttonTotalText = document.getElementById('buttonTotalText');
+        const totalAmountInput = document.getElementById('totalAmountInput');
+        const deliveryChargeInput = document.getElementById('deliveryChargeInput');
 
+        function updateCharges() {
+            let charge = shippingAreaSelect.value === 'inside' ? 100 : 150;
+            let total = unitPrice + charge;
+
+            shippingDisplay.textContent = '৳' + charge;
+            totalDisplay.textContent = '৳' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            buttonTotalText.textContent = '৳' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            totalAmountInput.value = total;
+            deliveryChargeInput.value = charge;
+        }
+
+        shippingAreaSelect.addEventListener('change', updateCharges);
+        updateCharges(); // Initial call
+    });
+</script>
+
+@include('frontend.layouts.footer')
 @endsection

@@ -113,6 +113,6 @@
 <!-- END MAIN CONTENT -->
 
 <!-- START FOOTER -->
-@include('frontend.layouts.others_footer')
+@include('frontend.layouts.footer')
 <!-- END FOOTER -->
 @endsection

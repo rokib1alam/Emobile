@@ -184,8 +184,8 @@
 
                         <button type="button"
                                 class="categories_btn categories_menu"
-                                data-toggle="collapse"
-                                data-target="#navCatContent"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#navCatContent"
                                 aria-expanded="false"
                                 aria-controls="navCatContent">
 

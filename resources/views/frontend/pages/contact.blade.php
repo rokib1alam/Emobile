@@ -118,6 +118,6 @@
 </div>
 <!-- END MAIN CONTENT -->
 
-@include('frontend.layouts.others_footer')
+@include('frontend.layouts.footer')
 
 @endsection

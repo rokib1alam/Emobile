@@ -150,6 +150,7 @@
                                                         </a>
                                                         <div class="product_action_box">
                                                             <ul class="list_none pr_action_btn">
+                                                                {{-- <li class="add-to-cart"><a href="#"><i class="icon-basket-loaded"></i> Add To Cart</a></li> --}}
                                                                 <!-- Buy Now Action -->
                                                                 <li>
                                                                     <a href="{{ route('checkout', ['product_id' => $featur->id]) }}" class="buy-now-btn" title="Buy Now">
@@ -956,7 +957,9 @@
                                     <h4>Featured Products</h4>
                                 </div>
                                 <div class="view_all">
-                                    <a href="#" class="text_default"><span>View All</span></a>
+                                    <a href="{{ route('featured.products') }}" class="text_default">
+                                        <span>View All</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -1015,7 +1018,9 @@
                                     <h4>Top Rated Products</h4>
                                 </div>
                                 <div class="view_all">
-                                    <a href="#" class="text_default"><span>View All</span></a>
+                                    <a href="{{ route('top.rated.products') }}" class="text_default">
+                                        <span>View All</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -1073,7 +1078,9 @@
                                     <h4>Popular Products</h4>
                                 </div>
                                 <div class="view_all">
-                                    <a href="#" class="text_default"><span>View All</span></a>
+                                    <a href="{{ route('popular.products') }}" class="text_default">
+                                        <span>View All</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>

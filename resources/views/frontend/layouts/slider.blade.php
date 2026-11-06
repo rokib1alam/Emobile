@@ -2,10 +2,10 @@
     <div id="carouselExampleControls" class="carousel slide carousel-fade light_arrow carousel_style2" data-bs-ride="carousel">
         <div class="carousel-inner">
             @foreach ($sliders as $index => $slider)
-                <div class="carousel-item {{ $index == 0 ? 'active' : '' }} position-relative" style="height: 100vh; overflow: hidden;">
+                <div class="carousel-item {{ $index == 0 ? 'active' : '' }} position-relative slider-item">
 
-                    <div class="background_bg overlay_bg_{{ $slider->overlay ?? '50' }} position-absolute top-0 start-0 w-100 h-100 z-0"
-                        style="background-image: url('{{ asset($slider->image_url) }}'); background-size: cover; background-position: center;">
+                    <div class="background_bg overlay_bg_{{ $slider->overlay ?? '50' }} position-absolute top-0 start-0 w-100 h-100 z-0 slider-bg"
+                        style="background-image: url('{{ asset($slider->image_url) }}');">
                     </div>
 
                     <!-- Slide Content -->
@@ -30,9 +30,6 @@
                                                 {{ $slider->caption_text }}
                                             </p>
                                         @endif
-
-                                        {{-- <a class="btn btn-white staggered-animation" href="shop-left-sidebar.html" data-animation="fadeInUp" data-animation-delay="0.4s">Shop Now</a> --}}
-
                                     </div>
                                 </div>
                             </div>

@@ -209,6 +209,6 @@
 <!-- Toastr JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <!-- START FOOTER -->
-@include('frontend.layouts.others_footer')
+@include('frontend.layouts.footer')
 <!-- END FOOTER -->
 @endsection

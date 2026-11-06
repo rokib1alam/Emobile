@@ -537,4 +537,131 @@ class FrontendController extends Controller
             'title' => $title,
         ]);
     }
+
+    public function featuredProducts()
+    {
+        $brands = Brand::where('front_page', 1)->get();
+
+        $sizes = Product::whereNotNull('size')
+            ->pluck('size')
+            ->flatMap(function ($item) {
+                return explode(',', $item);
+            })
+            ->unique()
+            ->values();
+
+        $colors = Product::whereNotNull('color')
+            ->pluck('color')
+            ->flatMap(function ($item) {
+                return explode(',', $item);
+            })
+            ->unique()
+            ->values();
+
+        $products = Product::where('status', 1)
+            ->where('featured', 1)
+            ->with('colors')
+            ->orderBy('id', 'DESC')
+            ->paginate(12)
+            ->appends(request()->query());
+
+        $this->calculateAndSortRatings($products);
+
+        $title = 'Featured Products';
+
+        $breadcrumb = [
+            ['name' => 'Home', 'url' => route('index')],
+            ['name' => 'Featured Products', 'url' => ''],
+        ];
+
+        return view('frontend.pages.category', compact(
+            'brands',
+            'sizes',
+            'colors',
+            'products',
+            'breadcrumb',
+            'title'
+        ));
+    }
+
+    public function topRatedProducts()
+    {
+        $brands = Brand::where('front_page', 1)->get();
+
+        $sizes = Product::whereNotNull('size')
+            ->pluck('size')
+            ->flatMap(fn($item) => explode(',', $item))
+            ->unique()
+            ->values();
+
+        $colors = Product::whereNotNull('color')
+            ->pluck('color')
+            ->flatMap(fn($item) => explode(',', $item))
+            ->unique()
+            ->values();
+
+        $products = Product::where('status', 1)
+            ->with('colors')
+            ->orderBy('product_views', 'DESC')
+            ->paginate(12)
+            ->appends(request()->query());
+
+        $this->calculateAndSortRatings($products);
+
+        $title = 'Top Rated Products';
+
+        $breadcrumb = [
+            ['name' => 'Home', 'url' => route('index')],
+            ['name' => 'Top Rated Products', 'url' => ''],
+        ];
+
+        return view('frontend.pages.category', compact(
+            'brands',
+            'sizes',
+            'colors',
+            'products',
+            'breadcrumb',
+            'title'
+        ));
+    }
+    public function popularProducts()
+    {
+        $brands = Brand::where('front_page', 1)->get();
+
+        $sizes = Product::whereNotNull('size')
+            ->pluck('size')
+            ->flatMap(fn($item) => explode(',', $item))
+            ->unique()
+            ->values();
+
+        $colors = Product::whereNotNull('color')
+            ->pluck('color')
+            ->flatMap(fn($item) => explode(',', $item))
+            ->unique()
+            ->values();
+
+        $products = Product::where('status', 1)
+            ->with('colors')
+            ->orderBy('product_views', 'DESC')
+            ->paginate(12)
+            ->appends(request()->query());
+
+        $this->calculateAndSortRatings($products);
+
+        $title = 'Popular Products';
+
+        $breadcrumb = [
+            ['name' => 'Home', 'url' => route('index')],
+            ['name' => 'Popular Products', 'url' => ''],
+        ];
+
+        return view('frontend.pages.category', compact(
+            'brands',
+            'sizes',
+            'colors',
+            'products',
+            'breadcrumb',
+            'title'
+        ));
+    }
 }

@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title','Shopwise|Product')
+@section('title','Product')
 @section('content')
 <!-- START HEADER -->
-@include('frontend.layouts.others_header')
+@include('frontend.layouts.nheader')
 <!-- END HEADER -->
 
 <!-- START SECTION BREADCRUMB -->
@@ -216,7 +216,7 @@
 <!-- END MAIN CONTENT -->
 
 <!-- START FOOTER -->
-@include('frontend.layouts.others_footer')
+@include('frontend.layouts.footer')
 <!-- END FOOTER -->
 <!-- Rating System code -->
 <script>
